@@ -1,0 +1,203 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  background: #0f0f12;
+  color: #e4e4e7;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.app header {
+  margin-bottom: 1.5rem;
+}
+
+.app h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #f4f4f5;
+}
+
+.subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #a1a1aa;
+}
+
+.capacity-section {
+  margin-bottom: 1.5rem;
+}
+
+.capacity-section label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.capacity-section input {
+  width: 4rem;
+  padding: 0.25rem 0.5rem;
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 4px;
+  color: #e4e4e7;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.controls,
+.visualizer {
+  padding: 1rem;
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+}
+
+.controls h2,
+.visualizer h2 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  color: #d4d4d8;
+}
+
+.control-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.control-row input {
+  padding: 0.35rem 0.5rem;
+  background: #27272a;
+  border: 1px solid #3f3f46;
+  border-radius: 4px;
+  color: #e4e4e7;
+  width: 5rem;
+}
+
+.control-row input::placeholder {
+  color: #71717a;
+}
+
+.control-row button {
+  padding: 0.35rem 0.75rem;
+  background: #3b82f6;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.control-row button:hover {
+  background: #2563eb;
+}
+
+.get-result {
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.get-result[data-hit="true"] {
+  color: #22c55e;
+}
+
+.get-result[data-hit="false"] {
+  color: #ef4444;
+}
+
+.reset-btn {
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  background: #52525b;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.reset-btn:hover {
+  background: #3f3f46;
+}
+
+.meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #a1a1aa;
+  margin-bottom: 0.5rem;
+}
+
+.min-freq {
+  color: #fbbf24;
+}
+
+.evicted {
+  padding: 0.35rem 0.5rem;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid #ef4444;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #fca5a5;
+  margin-bottom: 0.75rem;
+}
+
+.freq-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.freq-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.freq-label {
+  min-width: 5rem;
+  font-size: 0.875rem;
+  color: #a1a1aa;
+}
+
+.keys-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.key-badge {
+  padding: 0.2rem 0.5rem;
+  background: #27272a;
+  border: 1px solid #3f3f46;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.key-badge.evicted {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
+.visualizer .empty {
+  font-size: 0.875rem;
+  color: #71717a;
+}
