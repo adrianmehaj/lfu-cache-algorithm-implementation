@@ -1,5 +1,17 @@
 import { Node } from './Node';
 import { DoublyLinkedList } from './DoublyLinkedList';
+import type {
+  CacheStateSnapshot,
+  HighlightState,
+  CacheNodeSnapshot,
+  FrequencyBucketSnapshot,
+} from '../types/cache.types';
+
+export type PutAction = 'insert' | 'update' | 'evict_then_insert';
+export interface PutResult {
+  evictedKey: number | null;
+  action: PutAction;
+}
 
 /**
  * LFU (Least Frequently Used) Cache with O(1) get and put.
@@ -14,13 +26,11 @@ import { DoublyLinkedList } from './DoublyLinkedList';
  * - Each frequency list maintains LRU order (head = MRU, tail = LRU)
  */
 export class LFUCache {
-  readonly capacity: number;
+  capacity: number;
   size: number;
   minFreq: number;
   private keyTable: Map<number, Node>;
   private freqTable: Map<number, DoublyLinkedList>;
-  /** Track last evicted key for UI highlighting */
-  lastEvictedKey: number | null = null;
 
   constructor(capacity: number) {
     this.capacity = capacity;
@@ -44,26 +54,30 @@ export class LFUCache {
   /**
    * O(1) put: Inserts or updates key-value pair.
    * Evicts LRU among minFreq keys when cache is full.
+   * Returns put result for logging and UI.
    */
-  put(key: number, value: number): void {
-    if (this.capacity === 0) return;
-
-    this.lastEvictedKey = null;
+  put(key: number, value: number): PutResult {
+    if (this.capacity === 0) {
+      return { evictedKey: null, action: 'update' };
+    }
 
     const existing = this.keyTable.get(key);
     if (existing != null) {
       existing.value = value;
       this.updateFrequency(existing);
-      return;
+      return { evictedKey: null, action: 'update' };
     }
 
+    let evictedKey: number | null = null;
     if (this.size === this.capacity) {
-      const list = this.freqTable.get(this.minFreq)!;
-      const evicted = list.removeLast();
-      if (evicted != null) {
-        this.keyTable.delete(evicted.key);
-        this.lastEvictedKey = evicted.key;
-        this.size--;
+      const list = this.freqTable.get(this.minFreq);
+      if (list != null) {
+        const evicted = list.removeLast();
+        if (evicted != null) {
+          this.keyTable.delete(evicted.key);
+          evictedKey = evicted.key;
+          this.size--;
+        }
       }
     }
 
@@ -72,6 +86,11 @@ export class LFUCache {
     this.ensureFreqList(1).addFirst(node);
     this.minFreq = 1;
     this.size++;
+
+    return {
+      evictedKey,
+      action: evictedKey != null ? 'evict_then_insert' : 'insert',
+    };
   }
 
   /**
@@ -107,36 +126,59 @@ export class LFUCache {
     return list;
   }
 
-  /** Returns a snapshot of cache state for UI visualization. */
-  getStateSnapshot(): {
-    capacity: number;
-    size: number;
-    minFreq: number;
-    freqToKeys: Map<number, number[]>;
-    lastEvictedKey: number | null;
-  } {
-    const freqToKeys = new Map<number, number[]>();
-    for (const [freq, list] of this.freqTable.entries()) {
-      const keys = list.getKeys();
-      if (keys.length > 0) {
-        freqToKeys.set(freq, keys);
+  /**
+   * Returns a UI-friendly snapshot of actual internal state.
+   * Does not mutate cache; safe to call after any operation.
+   */
+  snapshot(highlight: HighlightState = emptyHighlight()): CacheStateSnapshot {
+    const entries: CacheNodeSnapshot[] = [];
+    const freqBuckets: FrequencyBucketSnapshot[] = [];
+
+    const sortedFreqs = Array.from(this.freqTable.keys()).sort((a, b) => a - b);
+
+    for (const freq of sortedFreqs) {
+      const list = this.freqTable.get(freq)!;
+      const nodes = list.toArray();
+      for (const n of nodes) {
+        entries.push(n);
       }
+      freqBuckets.push({
+        freq,
+        nodes,
+        isMinFreq: freq === this.minFreq,
+      });
     }
+
     return {
       capacity: this.capacity,
       size: this.size,
       minFreq: this.minFreq,
-      freqToKeys,
-      lastEvictedKey: this.lastEvictedKey,
+      entries,
+      freqBuckets,
+      highlight,
     };
   }
 
-  /** Resets the cache to empty state. */
-  reset(): void {
+  /**
+   * Resets cache to empty state.
+   * If newCapacity is provided, updates capacity (for capacity changes).
+   */
+  reset(newCapacity?: number): void {
+    if (newCapacity != null && newCapacity >= 0) {
+      this.capacity = newCapacity;
+    }
     this.size = 0;
     this.minFreq = 0;
     this.keyTable.clear();
     this.freqTable.clear();
-    this.lastEvictedKey = null;
   }
+}
+
+function emptyHighlight(): HighlightState {
+  return {
+    insertedKey: null,
+    accessedKey: null,
+    updatedKey: null,
+    evictedKey: null,
+  };
 }

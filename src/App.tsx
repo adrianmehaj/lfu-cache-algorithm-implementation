@@ -1,43 +1,81 @@
-import { useState } from 'react';
-import { CacheControls } from './components/CacheControls';
-import { CacheVisualizer } from './components/CacheVisualizer';
+import { useState, useEffect } from 'react';
+import { Navbar } from './components/Navbar';
+import { Sidebar } from './components/Sidebar';
+import { FrequencyBuckets } from './components/FrequencyBuckets';
+import { CacheMapTable } from './components/CacheMapTable';
+import { OperationLog } from './components/OperationLog';
+import { TheoryPage } from './components/TheoryPage';
+import { BenchmarksPage } from './components/BenchmarksPage';
 import { useLFUCache } from './hooks/useLFUCache';
 
+type TabId = 'visualizer' | 'benchmarks' | 'theory';
+
 function App() {
-  const [capacity, setCapacity] = useState(2);
-  const { put, get, reset, snapshot } = useLFUCache(capacity);
+  const [activeTab, setActiveTab] = useState<TabId>('visualizer');
+  const [darkMode, setDarkMode] = useState(true);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+  }, [darkMode]);
+
+  const {
+    put,
+    get,
+    reset,
+    setCapacity,
+    loadDemo,
+    stepDemo,
+    capacity,
+    snapshot,
+    logs,
+    hasMoreDemoSteps,
+  } = useLFUCache(2);
 
   return (
-    <main className="app">
-      <header>
-        <h1>LFU Cache Algorithm</h1>
-        <p className="subtitle">
-          O(1) get & put · Evict least frequently used, LRU tiebreaker
-        </p>
-      </header>
-      <section className="capacity-section">
-        <label>
-          Capacity:
-          <input
-            type="number"
-            min={1}
-            max={20}
-            value={capacity}
-            onChange={(e) => {
-              const v = parseInt(e.target.value, 10);
-              if (!Number.isNaN(v) && v >= 1) {
-                setCapacity(v);
-                reset();
-              }
-            }}
+    <div className="app">
+      <Navbar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        darkMode={darkMode}
+        onThemeToggle={() => setDarkMode(!darkMode)}
+      />
+
+      {activeTab === 'visualizer' && (
+        <div className="app__layout">
+          <Sidebar
+            capacity={capacity}
+            size={snapshot.size}
+            minFreq={snapshot.minFreq}
+            onCapacityChange={setCapacity}
+            onPut={put}
+            onGet={get}
+            onReset={reset}
+            onLoadDemo={loadDemo}
+            onStepDemo={stepDemo}
+            hasMoreDemoSteps={hasMoreDemoSteps}
           />
-        </label>
-      </section>
-      <div className="content">
-        <CacheControls onPut={put} onGet={get} onReset={reset} />
-        <CacheVisualizer snapshot={snapshot} />
-      </div>
-    </main>
+          <main className="app__main">
+            <div className="app__viz-section">
+              <FrequencyBuckets snapshot={snapshot} />
+            </div>
+            <div className="app__table-section">
+              <CacheMapTable snapshot={snapshot} />
+            </div>
+            {snapshot.highlight.evictedKey != null && (
+              <div className="app__evicted">
+                Evicted key: {snapshot.highlight.evictedKey}
+              </div>
+            )}
+          </main>
+          <aside className="app__events">
+            <OperationLog logs={logs} />
+          </aside>
+        </div>
+      )}
+
+      {activeTab === 'benchmarks' && <BenchmarksPage />}
+      {activeTab === 'theory' && <TheoryPage />}
+    </div>
   );
 }
 

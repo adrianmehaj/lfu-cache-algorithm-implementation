@@ -70,4 +70,17 @@ export class DoublyLinkedList {
     }
     return keys;
   }
+
+  /**
+   * Returns full node data as array (MRU to LRU order) for UI snapshot.
+   */
+  toArray(): Array<{ key: number; value: number; freq: number }> {
+    const result: Array<{ key: number; value: number; freq: number }> = [];
+    let curr = this.head.next;
+    while (curr && curr !== this.tail) {
+      result.push({ key: curr.key, value: curr.value, freq: curr.freq });
+      curr = curr.next;
+    }
+    return result;
+  }
 }
