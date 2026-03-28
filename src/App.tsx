@@ -1,82 +1,27 @@
 import { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
-import { Sidebar } from './components/Sidebar';
-import { FrequencyBuckets } from './components/FrequencyBuckets';
-import { CacheMapTable } from './components/CacheMapTable';
-import { OperationLog } from './components/OperationLog';
-import { TheoryPage } from './components/TheoryPage';
-import { BenchmarksPage } from './components/BenchmarksPage';
-import { useLFUCache } from './hooks/useLFUCache';
+import { Layout } from './components/Layout';
+import { VisualizerPage } from './pages/VisualizerPage';
+import { BenchmarksPage } from './pages/BenchmarksPage';
+import { TheoryPage } from './pages/TheoryPage';
+import { I18nProvider } from './i18n/I18nContext';
 
-type TabId = 'visualizer' | 'benchmarks' | 'theory';
+type Tab = 'visualizer' | 'benchmarks' | 'theory';
 
-function App() {
-  const [activeTab, setActiveTab] = useState<TabId>('visualizer');
-  const [darkMode, setDarkMode] = useState(true);
+export default function App() {
+  const [tab, setTab] = useState<Tab>('visualizer');
+  const [dark, setDark] = useState(true);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-  }, [darkMode]);
-
-  const {
-    put,
-    get,
-    reset,
-    setCapacity,
-    loadDemo,
-    stepDemo,
-    capacity,
-    snapshot,
-    logs,
-    hasMoreDemoSteps,
-  } = useLFUCache(2);
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  }, [dark]);
 
   return (
-    <div className="app">
-      <Navbar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        darkMode={darkMode}
-        onThemeToggle={() => setDarkMode(!darkMode)}
-      />
-
-      {activeTab === 'visualizer' && (
-        <div className="app__layout">
-          <Sidebar
-            capacity={capacity}
-            size={snapshot.size}
-            minFreq={snapshot.minFreq}
-            onCapacityChange={setCapacity}
-            onPut={put}
-            onGet={get}
-            onReset={reset}
-            onLoadDemo={loadDemo}
-            onStepDemo={stepDemo}
-            hasMoreDemoSteps={hasMoreDemoSteps}
-          />
-          <main className="app__main">
-            <div className="app__viz-section">
-              <FrequencyBuckets snapshot={snapshot} />
-            </div>
-            <div className="app__table-section">
-              <CacheMapTable snapshot={snapshot} />
-            </div>
-            {snapshot.highlight.evictedKey != null && (
-              <div className="app__evicted">
-                Evicted key: {snapshot.highlight.evictedKey}
-              </div>
-            )}
-          </main>
-          <aside className="app__events">
-            <OperationLog logs={logs} />
-          </aside>
-        </div>
-      )}
-
-      {activeTab === 'benchmarks' && <BenchmarksPage />}
-      {activeTab === 'theory' && <TheoryPage />}
-    </div>
+    <I18nProvider>
+      <Layout tab={tab} onTab={setTab} dark={dark} onTheme={() => setDark(!dark)}>
+        {tab === 'visualizer' && <VisualizerPage />}
+        {tab === 'benchmarks' && <BenchmarksPage />}
+        {tab === 'theory'     && <TheoryPage />}
+      </Layout>
+    </I18nProvider>
   );
 }
-
-export default App;

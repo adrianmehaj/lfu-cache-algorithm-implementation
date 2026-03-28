@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ~90% browser zoom at 100%: tighter UI via rem scale + slightly smaller radii */
+html {
+  font-size: 90%;
+}
+
+/* Dark theme: lifted slate (not pure black) — clearer layers, less eye strain */
+:root {
+  --bg:          #13161d;
+  --bg-card:     #1c212c;
+  --bg-elevated: #252b38;
+  --bg-input:    #181d27;
+  --border:      #3d4654;
+  --border-sub:  #2a3140;
+  --text:        #e6edf3;
+  --muted:       #8b949e;
+  --dim:         #6e7681;
+  --accent:      #3b82f6;
+  --accent-h:    #2563eb;
+  --accent-soft: rgba(59, 130, 246, 0.14);
+  --ok:          #22c55e;  --ok-bg:  rgba(34,197,94,.12);
+  --err:         #ef4444;  --err-bg: rgba(239,68,68,.12);
+  --warn:        #f59e0b;  --warn-bg:rgba(245,158,11,.12);
+  --info:        #0ea5e9;  --info-bg:rgba(14,165,233,.12);
+  --r:    11px;
+  --r-sm: 7px;
+  --sans: 'Inter', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  /* Motion & elevation (product UI) */
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur: 0.2s;
+  --shadow-nav: 0 4px 28px rgba(0, 0, 0, 0.14);
+  --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.045);
+  --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --shadow-drawer: 12px 0 64px rgba(0, 0, 0, 0.35);
+  --focus: 2px solid var(--accent);
+  --focus-offset: 2px;
+}
+
+[data-theme="light"] {
+  --bg:          #f6f8fa;
+  --bg-card:     #fff;
+  --bg-elevated: #fff;
+  --bg-input:    #f0f2f5;
+  --border:      #d0d7de;
+  --border-sub:  #eaeef2;
+  --text:        #1f2328;
+  --muted:       #656d76;
+  --dim:         #8c959f;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: rgba(59, 130, 246, 0.12);
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Accessible focus — keyboard only */
+:where(
+  button,
+  [href],
+  input,
+  select,
+  textarea,
+  [tabindex]:not([tabindex='-1'])
+):focus-visible {
+  outline: var(--focus);
+  outline-offset: var(--focus-offset);
+}
+
+:where(.nav__tab--on):focus-visible {
+  outline-color: #fff;
+  outline-offset: 3px;
+}
+
+::selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: inherit;
+}
+
+[data-theme='light'] ::selection {
+  background: rgba(59, 130, 246, 0.22);
+}

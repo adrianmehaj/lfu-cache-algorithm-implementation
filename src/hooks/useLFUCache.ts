@@ -1,219 +1,109 @@
 import { useCallback, useRef, useState } from 'react';
-import { LFUCache } from '../lfu/LFUCache';
-import type {
-  CacheStateSnapshot,
-  CacheStats,
-  HighlightState,
-  OperationLogEntry,
-} from '../types/cache.types';
+import { LFUCache } from '../core/LFUCache';
+import type { CacheSnapshot, Highlight, LogEntry, Stats } from '../types';
+import { emptyHighlight, emptyStats } from '../types';
 
-const DEFAULT_CAPACITY = 2;
+let seq = 0;
+const uid = () => `l${++seq}`;
 
-const DEMO_STEPS: Array<{ op: 'put' | 'get'; key: number; value?: number }> = [
-  { op: 'put', key: 1, value: 1 },
-  { op: 'put', key: 2, value: 2 },
-  { op: 'get', key: 1 },
-  { op: 'put', key: 3, value: 3 },
-  { op: 'get', key: 2 },
-  { op: 'get', key: 3 },
-  { op: 'put', key: 4, value: 4 },
-  { op: 'get', key: 1 },
-  { op: 'get', key: 3 },
-  { op: 'get', key: 4 },
+const DEMO: Array<{ op: 'put' | 'get'; k: number; v?: number }> = [
+  { op: 'put', k: 1, v: 1 }, { op: 'put', k: 2, v: 2 },
+  { op: 'get', k: 1 },       { op: 'put', k: 3, v: 3 },
+  { op: 'get', k: 2 },       { op: 'get', k: 3 },
+  { op: 'put', k: 4, v: 4 }, { op: 'get', k: 1 },
+  { op: 'get', k: 3 },       { op: 'get', k: 4 },
 ];
 
-function genId(): string {
-  return `log_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+function snap(c: LFUCache, hl: Highlight): CacheSnapshot {
+  const s = c.getState();
+  return {
+    ...s,
+    entries: s.freqBuckets.flatMap((b) => b.nodes),
+    freqBuckets: s.freqBuckets.map((b) => ({ ...b, isMinFreq: b.freq === s.minFreq })),
+    highlight: hl,
+  };
 }
 
-/**
- * React hook that wraps LFUCache with UI state, logs, stats, and demo controls.
- */
-export function useLFUCache(initialCapacity: number = DEFAULT_CAPACITY) {
-  const [capacity, setCapacityState] = useState(initialCapacity);
-  const cacheRef = useRef<LFUCache | null>(null);
-  const [logs, setLogs] = useState<OperationLogEntry[]>([]);
-  const [stats, setStats] = useState<CacheStats>({
-    totalPut: 0,
-    totalGet: 0,
-    evictions: 0,
-    hits: 0,
-    misses: 0,
-  });
-  const [highlight, setHighlight] = useState<HighlightState>({
-    insertedKey: null,
-    accessedKey: null,
-    updatedKey: null,
-    evictedKey: null,
-  });
-  const [demoStepIndex, setDemoStepIndex] = useState(0);
+function allKeys(c: LFUCache): Set<number> {
+  return new Set(c.getState().freqBuckets.flatMap((b) => b.nodes.map((n) => n.key)));
+}
 
-  if (cacheRef.current == null) {
-    cacheRef.current = new LFUCache(capacity);
-  }
-  const cache = cacheRef.current;
+export function useLFUCache(initCap = 2) {
+  const cacheRef = useRef(new LFUCache(initCap));
+  const [capacity, setCapState] = useState(initCap);
+  const [snapshot, setSnap] = useState<CacheSnapshot>(() => snap(cacheRef.current, emptyHighlight()));
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [stats, setStats] = useState<Stats>(emptyStats);
+  const [demoIdx, setDemoIdx] = useState(0);
 
-  const [snapshot, setSnapshot] = useState<CacheStateSnapshot>(() =>
-    cache.snapshot(highlight)
-  );
+  const put = useCallback((key: number, value: number) => {
+    const c = cacheRef.current;
+    const before = allKeys(c);
+    const isUpdate = before.has(key);
+    c.put(key, value);
+    const after = allKeys(c);
 
-  const clearHighlight = useCallback(() => {
-    setHighlight({
-      insertedKey: null,
+    let evictedKey: number | null = null;
+    if (!isUpdate) {
+      for (const k of before) {
+        if (!after.has(k)) { evictedKey = k; break; }
+      }
+    }
+
+    const hl: Highlight = {
+      insertedKey: isUpdate ? null : key,
+      updatedKey: isUpdate ? key : null,
       accessedKey: null,
-      updatedKey: null,
-      evictedKey: null,
-    });
+      evictedKey,
+    };
+    setSnap(snap(c, hl));
+
+    const newLogs: LogEntry[] = [];
+    if (evictedKey != null) newLogs.push({ id: uid(), type: 'evict', key: evictedKey });
+    newLogs.push({ id: uid(), type: 'put', key, value, update: isUpdate });
+    setLogs((p) => [...p, ...newLogs]);
+    setStats((s) => ({ ...s, puts: s.puts + 1, evictions: s.evictions + (evictedKey != null ? 1 : 0) }));
   }, []);
 
-  const setCapacity = useCallback((newCapacity: number) => {
-    if (newCapacity < 0) return;
-    setCapacityState(newCapacity);
-    cacheRef.current = new LFUCache(newCapacity);
-    setLogs([]);
-    setStats({
-      totalPut: 0,
-      totalGet: 0,
-      evictions: 0,
-      hits: 0,
-      misses: 0,
-    });
-    clearHighlight();
-    setSnapshot(cacheRef.current.snapshot(emptyHighlight()));
-    setDemoStepIndex(0);
-  }, [clearHighlight]);
-
-  const put = useCallback(
-    (key: number, value: number) => {
-      const cache = cacheRef.current!;
-      const result = cache.put(key, value);
-      const hl: HighlightState = {
-        insertedKey: result.action === 'insert' ? key : null,
-        accessedKey: null,
-        updatedKey: result.action === 'update' ? key : null,
-        evictedKey: result.evictedKey,
-      };
-      setHighlight(hl);
-      setSnapshot(cache.snapshot(hl));
-
-      setStats((s) => ({
-        ...s,
-        totalPut: s.totalPut + 1,
-        evictions: s.evictions + (result.evictedKey != null ? 1 : 0),
-      }));
-
-      const entries: OperationLogEntry[] = [];
-      if (result.evictedKey != null) {
-        entries.push({
-          id: genId(),
-          type: 'evict',
-          message: `EVICT key=${result.evictedKey}`,
-          args: {},
-        });
-      }
-      entries.push({
-        id: genId(),
-        type: 'put',
-        message:
-          result.action === 'update'
-            ? `PUT(${key}, ${value}) [updated]`
-            : `PUT(${key}, ${value})`,
-        args: { key, value },
-      });
-      setLogs((prev) => [...prev, ...entries]);
-    },
-    []
-  );
-
   const get = useCallback((key: number) => {
-    const cache = cacheRef.current!;
-    const result = cache.get(key);
+    const result = cacheRef.current.get(key);
     const hit = result !== -1;
-    const hl: HighlightState = {
-      insertedKey: null,
-      accessedKey: hit ? key : null,
-      updatedKey: null,
-      evictedKey: null,
-    };
-    setHighlight(hl);
-    setSnapshot(cache.snapshot(hl));
-
-    setStats((s) => ({
-      ...s,
-      totalGet: s.totalGet + 1,
-      hits: s.hits + (hit ? 1 : 0),
-      misses: s.misses + (hit ? 0 : 1),
-    }));
-
-    setLogs((prev) => [
-      ...prev,
-      {
-        id: genId(),
-        type: 'get',
-        message: `GET(${key}) => ${result}`,
-        args: { key },
-        result,
-        hit,
-      },
-    ]);
-
+    setSnap(snap(cacheRef.current, { ...emptyHighlight(), accessedKey: hit ? key : null }));
+    setLogs((p) => [...p, { id: uid(), type: 'get', key, result, hit }]);
+    setStats((s) => ({ ...s, gets: s.gets + 1, hits: s.hits + (hit ? 1 : 0), misses: s.misses + (hit ? 0 : 1) }));
     return result;
   }, []);
 
   const reset = useCallback(() => {
-    const cache = cacheRef.current!;
-    cache.reset(capacity);
+    cacheRef.current.reset(capacity);
+    setSnap(snap(cacheRef.current, emptyHighlight()));
     setLogs([]);
-    setStats({
-      totalPut: 0,
-      totalGet: 0,
-      evictions: 0,
-      hits: 0,
-      misses: 0,
-    });
-    clearHighlight();
-    setSnapshot(cache.snapshot(emptyHighlight()));
-    setDemoStepIndex(0);
-  }, [capacity, clearHighlight]);
+    setStats(emptyStats);
+    setDemoIdx(0);
+  }, [capacity]);
 
-  const loadDemo = useCallback(() => {
-    setCapacity(2);
-  }, [setCapacity]);
+  const setCapacity = useCallback((cap: number) => {
+    if (cap < 0) return;
+    setCapState(cap);
+    cacheRef.current = new LFUCache(cap);
+    setSnap(snap(cacheRef.current, emptyHighlight()));
+    setLogs([]);
+    setStats(emptyStats);
+    setDemoIdx(0);
+  }, []);
+
+  const loadDemo = useCallback(() => setCapacity(2), [setCapacity]);
 
   const stepDemo = useCallback(() => {
-    if (demoStepIndex >= DEMO_STEPS.length) return;
-    const step = DEMO_STEPS[demoStepIndex];
-    if (step.op === 'put' && step.value != null) {
-      put(step.key, step.value);
-    } else {
-      get(step.key);
-    }
-    setDemoStepIndex((i) => i + 1);
-  }, [put, get, demoStepIndex]);
-
-  const hasMoreDemoSteps = demoStepIndex < DEMO_STEPS.length;
+    if (demoIdx >= DEMO.length) return;
+    const s = DEMO[demoIdx];
+    s.op === 'put' ? put(s.k, s.v!) : get(s.k);
+    setDemoIdx((i) => i + 1);
+  }, [demoIdx, put, get]);
 
   return {
-    put,
-    get,
-    reset,
-    setCapacity,
-    loadDemo,
-    stepDemo,
-    capacity,
-    snapshot,
-    logs,
-    stats,
-    hasMoreDemoSteps,
-    demoStepIndex,
-  };
-}
-
-function emptyHighlight(): HighlightState {
-  return {
-    insertedKey: null,
-    accessedKey: null,
-    updatedKey: null,
-    evictedKey: null,
+    put, get, reset, setCapacity, loadDemo, stepDemo,
+    capacity, snapshot, logs, stats,
+    hasMoreDemoSteps: demoIdx < DEMO.length, demoStepIndex: demoIdx,
   };
 }
