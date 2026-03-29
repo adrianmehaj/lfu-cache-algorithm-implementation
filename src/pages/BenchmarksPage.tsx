@@ -1,6 +1,9 @@
+import { useRef, useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useBenchmark } from '../hooks/useBenchmark';
 import type { WorkloadType } from '../types';
 import { useI18n } from '../i18n/I18nContext';
+import { BenchmarkCharts, BenchmarkTable, BenchmarkSummary, TableExportButton, ChartExportButtons } from '../components/benchmark';
 
 const opsOpts = [{ v: 1000, l: '1K' }, { v: 5000, l: '5K' }, { v: 10_000, l: '10K' }, { v: 50_000, l: '50K' }, { v: 100_000, l: '100K' }];
 const wlOpts: { v: WorkloadType; tk: string }[] = [
@@ -14,67 +17,148 @@ export function BenchmarksPage() {
   const { t } = useI18n();
   const { config, setConfig, results, running, run } = useBenchmark();
   const set = (p: Partial<typeof config>) => setConfig((c) => ({ ...c, ...p }));
+  const chartsRef = useRef<HTMLDivElement>(null);
+  const prevRunning = useRef(false);
+  const [showComplete, setShowComplete] = useState(false);
 
-  const maxHit = results ? Math.max(...results.map((r) => r.hitRate), 1) : 100;
-  const maxLat = results ? Math.max(...results.map((r) => r.avgLatencyUs), 0.01) : 1;
+  useEffect(() => {
+    if (prevRunning.current && !running && results && results.length > 0) {
+      setShowComplete(true);
+      const id = window.setTimeout(() => setShowComplete(false), 5000);
+      return () => clearTimeout(id);
+    }
+    prevRunning.current = running;
+  }, [running, results]);
+
+  const tableHeaders = {
+    policy: t('bench.policy'),
+    hitRate: t('bench.hitRate'),
+    missRate: t('bench.missRate'),
+    avgLatency: t('bench.avgLatency'),
+    totalTime: t('bench.totalTime'),
+  };
+
+  const chartExportLabels = {
+    exportPng: t('bench.exportPng'),
+    exportSvg: t('bench.exportSvg'),
+    sectionCharts: t('bench.sectionCharts'),
+    hintPng: t('bench.hintPng'),
+    hintSvg: t('bench.hintSvg'),
+    svgTitle: t('bench.svgTitle'),
+    svgHit: t('bench.svgHit'),
+    svgLat: t('bench.svgLat'),
+  };
+
+  const summaryLabels = {
+    bestHit: t('bench.summaryBestHit'),
+    fastest: t('bench.summaryFastest'),
+  };
 
   return (
-    <div className="page">
+    <div className="page bench-page">
       <h1 className="page__title">{t('bench.title')}</h1>
       <p className="page__sub">{t('bench.subtitle')}</p>
 
-      <div className="card page__card">
-        <div className="bench-cfg">
-          <div className="field"><label>{t('bench.capacity')}</label><input type="number" min={1} max={512} value={config.capacity} onChange={(e) => set({ capacity: Math.max(1, +e.target.value || 1) })} /></div>
-          <div className="field"><label>{t('bench.totalOps')}</label><select value={config.totalOps} onChange={(e) => set({ totalOps: +e.target.value })}>{opsOpts.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}</select></div>
-          <div className="field"><label>{t('bench.readRatio')}</label><input type="number" min={0} max={1} step={0.1} value={config.readRatio} onChange={(e) => set({ readRatio: Math.min(1, Math.max(0, +e.target.value || 0)) })} /></div>
-          <div className="field"><label>{t('bench.workload')}</label><select value={config.workload} onChange={(e) => set({ workload: e.target.value as WorkloadType })}>{wlOpts.map((o) => <option key={o.v} value={o.v}>{t(o.tk)}</option>)}</select></div>
+      <AnimatePresence>
+        {showComplete && results && (
+          <motion.div
+            className="bench-toast"
+            role="status"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3 }}
+          >
+            {t('bench.simulationComplete')}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="card page__card bench-cfg-card">
+        <div className={`bench-cfg-wrap ${running ? 'bench-cfg-wrap--loading' : ''}`}>
+          <div className="bench-cfg">
+            <div className="field">
+              <label>{t('bench.capacity')}</label>
+              <input type="number" min={1} max={512} value={config.capacity} onChange={(e) => set({ capacity: Math.max(1, +e.target.value || 1) })} disabled={running} />
+            </div>
+            <div className="field">
+              <label>{t('bench.totalOps')}</label>
+              <select value={config.totalOps} onChange={(e) => set({ totalOps: +e.target.value })} disabled={running}>
+                {opsOpts.map((o) => (
+                  <option key={o.v} value={o.v}>
+                    {o.l}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="field">
+              <label>{t('bench.readRatio')}</label>
+              <input type="number" min={0} max={1} step={0.1} value={config.readRatio} onChange={(e) => set({ readRatio: Math.min(1, Math.max(0, +e.target.value || 0)) })} disabled={running} />
+            </div>
+            <div className="field">
+              <label>{t('bench.workload')}</label>
+              <select value={config.workload} onChange={(e) => set({ workload: e.target.value as WorkloadType })} disabled={running}>
+                {wlOpts.map((o) => (
+                  <option key={o.v} value={o.v}>
+                    {t(o.tk)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          {running && (
+            <div className="bench-loading" aria-busy="true">
+              <div className="bench-loading__spinner" />
+              <div className="bench-loading__bar" role="progressbar" aria-valuetext={t('bench.running')}>
+                <div className="bench-loading__bar-fill" />
+              </div>
+              <span className="bench-loading__text">{t('bench.running')}</span>
+            </div>
+          )}
         </div>
-        <button className="btn btn--primary bench-run" onClick={run} disabled={running}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        <motion.button
+          className="btn btn--primary bench-run"
+          onClick={run}
+          disabled={running}
+          whileHover={{ scale: running ? 1 : 1.02 }}
+          whileTap={{ scale: running ? 1 : 0.98 }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <path d="M8 5v14l11-7z" />
+          </svg>
           {running ? t('bench.running') : t('bench.run')}
-        </button>
+        </motion.button>
       </div>
 
       {results && (
         <>
-          <div className="card page__card">
-            <div className="bench-table-wrap">
-              <table className="bench-table">
-                <thead><tr><th>{t('bench.policy')}</th><th>{t('bench.hitRate')}</th><th>{t('bench.missRate')}</th><th>{t('bench.avgLatency')}</th><th>{t('bench.totalTime')}</th></tr></thead>
-                <tbody>{results.map((r) => (
-                  <tr key={r.policy}>
-                    <td style={{ fontWeight: 600 }}>{r.policy}</td>
-                    <td className="bench-hit">{r.hitRate.toFixed(1)}%</td>
-                    <td className="bench-miss">{r.missRate.toFixed(1)}%</td>
-                    <td style={{ fontFamily: 'var(--mono)' }}>{r.avgLatencyUs.toFixed(2)} µs</td>
-                    <td style={{ fontFamily: 'var(--mono)' }}>{r.totalTimeMs.toFixed(1)} ms</td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            </div>
-          </div>
-          <div className="bench-charts">
-            <div className="card">
-              <h4 className="card__title">{t('bench.hitChart')}</h4>
-              {results.map((r) => (
-                <div key={r.policy} className="bar-row">
-                  <span className="bar-label">{r.policy}</span>
-                  <div className="bar-track"><div className="bar-fill bar-fill--hit" style={{ width: `${(r.hitRate / maxHit) * 100}%` }} /></div>
-                  <span className="bar-value">{r.hitRate.toFixed(1)}%</span>
-                </div>
-              ))}
-            </div>
-            <div className="card">
-              <h4 className="card__title">{t('bench.latChart')}</h4>
-              {results.map((r) => (
-                <div key={r.policy} className="bar-row">
-                  <span className="bar-label">{r.policy}</span>
-                  <div className="bar-track"><div className="bar-fill bar-fill--lat" style={{ width: `${(r.avgLatencyUs / maxLat) * 100}%` }} /></div>
-                  <span className="bar-value">{r.avgLatencyUs.toFixed(2)} µs</span>
-                </div>
-              ))}
-            </div>
+          <BenchmarkSummary results={results} labels={summaryLabels} />
+
+          <motion.div className="card page__card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.35 }}>
+            <TableExportButton
+              results={results}
+              label={t('bench.exportExcel')}
+              hint={t('bench.exportExcelHint')}
+              headers={tableHeaders}
+              sheetName={t('bench.excelSheet')}
+            />
+            <BenchmarkTable
+              results={results}
+              labels={tableHeaders}
+            />
+          </motion.div>
+
+          <div className="bench-charts-outer card page__card">
+            <ChartExportButtons results={results} chartRef={chartsRef} labels={chartExportLabels} />
+            <BenchmarkCharts
+              ref={chartsRef}
+              results={results}
+              hitTitle={t('bench.hitChart')}
+              latTitle={t('bench.latChart')}
+              hitLabel={t('bench.chartHit')}
+              missLabel={t('bench.chartMiss')}
+              latAxisLabel={t('bench.avgLatency')}
+            />
           </div>
         </>
       )}

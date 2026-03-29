@@ -672,32 +672,73 @@
 
 /* ── Demo Focus Effects ── */
 .demo-dim {
-  opacity: 0.2;
-  filter: grayscale(0.5) blur(2px);
+  opacity: 0.15;
+  filter: grayscale(0.6) blur(3px);
   pointer-events: none;
-  transition: all 0.8s var(--ease-out);
+  transition: all 0.6s var(--ease-out);
 }
 
 .demo-focus-ring {
   position: relative;
   z-index: 10;
-  transition: all 0.8s var(--ease-out);
+  transition: all 0.6s var(--ease-out);
+  transform: scale(1.01);
+}
+
+.demo-focus-ring::before {
+  content: '▶ FOCUS';
+  position: absolute;
+  top: -1.8rem;
+  left: 0;
+  font: 800 0.6rem var(--sans);
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  text-shadow: 0 0 12px var(--accent-glow);
+  animation: focus-label-pulse 1.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 11;
 }
 
 .demo-focus-ring::after {
   content: '';
   position: absolute;
-  inset: -10px;
-  border: 3px solid var(--accent);
+  inset: -8px;
+  border: 2px solid var(--accent);
   border-radius: var(--r-lg);
-  box-shadow: 0 0 30px var(--accent-glow);
+  box-shadow:
+    0 0 20px var(--accent-glow),
+    0 0 60px rgba(79, 70, 229, 0.15),
+    inset 0 0 30px rgba(79, 70, 229, 0.03);
   pointer-events: none;
-  animation: pulse-focus 2s infinite;
+  animation: pulse-focus 2s ease-in-out infinite;
 }
 
 @keyframes pulse-focus {
-  0% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.02); opacity: 0.4; }
-  100% { transform: scale(1); opacity: 0.8; }
+  0% { opacity: 0.9; box-shadow: 0 0 20px var(--accent-glow), 0 0 60px rgba(79, 70, 229, 0.15); }
+  50% { opacity: 0.5; box-shadow: 0 0 40px var(--accent-glow), 0 0 80px rgba(79, 70, 229, 0.2); }
+  100% { opacity: 0.9; box-shadow: 0 0 20px var(--accent-glow), 0 0 60px rgba(79, 70, 229, 0.15); }
+}
+
+@keyframes focus-label-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* On mobile, scroll-snap and bigger focus indicators */
+@media (max-width: 899px) {
+  .demo-focus-ring {
+    scroll-margin-top: 5rem;
+    transform: none;
+  }
+
+  .demo-focus-ring::before {
+    font-size: 0.7rem;
+    top: -2rem;
+  }
+
+  .demo-dim {
+    opacity: 0.1;
+    filter: grayscale(0.8) blur(4px);
+  }
 }
 
