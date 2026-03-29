@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import type { LogEntry } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 
@@ -10,7 +11,7 @@ const icons: Record<LogEntry['type'], JSX.Element> = {
 function formatLog(e: LogEntry, t: (k: string, v?: Record<string, string | number>) => string, missLabel: string): string {
   switch (e.type) {
     case 'evict':
-      return t('log.evict', { key: e.key });
+      return t('log.evict', { key: e.key, value: e.value });
     case 'put':
       return e.update ? t('log.putUpdate', { key: e.key, value: e.value }) : t('log.put', { key: e.key, value: e.value });
     case 'get':
@@ -32,12 +33,20 @@ export function EventLog({ logs }: { logs: LogEntry[] }) {
         {logs.length === 0 ? (
           <p className="elog__empty">{t('log.empty')}</p>
         ) : (
-          [...logs].reverse().map((e) => (
-            <div key={e.id} className={`elog__item elog__item--${e.type}`}>
-              <span className="elog__icon">{icons[e.type]}</span>
-              <span>{formatLog(e, t, miss)}</span>
-            </div>
-          ))
+          <AnimatePresence initial={false}>
+            {[...logs].reverse().map((e) => (
+              <motion.div
+                key={e.id}
+                className={`elog__item elog__item--${e.type}`}
+                initial={{ opacity: 0, x: 24 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <span className="elog__icon">{icons[e.type]}</span>
+                <span>{formatLog(e, t, miss)}</span>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         )}
       </div>
     </div>

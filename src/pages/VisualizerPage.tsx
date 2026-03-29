@@ -39,9 +39,11 @@ export function VisualizerPage() {
         {snapshot.highlight.evictedKey != null && (
           <div className="evict-banner" role="status">
             <div className="evict-banner__title">
-              {t('viz.evictedTitle')}: <strong>{snapshot.highlight.evictedKey}</strong>
+              {t('viz.evictedTitle')}: <strong>{snapshot.highlight.evictedKey}</strong> (Vlera: {snapshot.highlight.evictedValue})
             </div>
-            <p className="evict-banner__hint">{t('viz.evictedHint')}</p>
+            <p className="evict-banner__hint">
+              {t('viz.evictedHint', { key: snapshot.highlight.evictedKey, value: snapshot.highlight.evictedValue ?? '?' })}
+            </p>
           </div>
         )}
       </main>

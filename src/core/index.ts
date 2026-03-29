@@ -1,5 +1,3 @@
-export { Node } from './Node';
-export { DoublyLinkedList } from './DoublyLinkedList';
-export { LFUCache } from './LFUCache';
+export { LFUNode, FreqBucket, LFUCache } from './LFUCacheAlgorithm';
 export { LRUCache } from './LRUCache';
 export { FIFOCache } from './FIFOCache';

@@ -387,6 +387,7 @@
 /* ── Frequency Buckets ── */
 .buckets { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 .bucket {
+  position: relative;
   padding: 0.75rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
@@ -394,6 +395,27 @@
   min-width: 160px;
   transition: all var(--dur) var(--ease-out);
   box-shadow: var(--shadow-sm);
+}
+
+.bucket::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--border-hover), transparent);
+  border-radius: 0 0 2px 2px;
+  pointer-events: none;
+  transition: background var(--dur) var(--ease-out);
+}
+
+.bucket:hover::after {
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+.bucket--min::after {
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
 }
 
 .bucket:hover {
@@ -408,8 +430,80 @@
   box-shadow: 0 0 30px -10px var(--accent-glow);
 }
 
-.bucket__freq { font: 800 1rem var(--mono); color: var(--text); }
-.bucket__tag  { font-size: 0.7rem; color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+.bucket__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.bucket__freq-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.7rem;
+  background: var(--accent-soft);
+  border: 1px solid rgba(79, 70, 229, 0.15);
+  border-radius: 8px;
+}
+
+.bucket__freq-num {
+  font: 800 1.2rem var(--mono);
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+.bucket__freq-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.bucket__tag {
+  font-size: 0.6rem;
+  color: var(--accent);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.15rem 0.5rem;
+  background: var(--accent-soft);
+  border-radius: 6px;
+}
+
+.bucket__dir {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.1rem 0.25rem 0;
+}
+
+.bucket__dir--bottom {
+  padding: 0 0.25rem 0.1rem;
+}
+
+.bucket__dir-label {
+  font-size: 0.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+.bucket__dir-label--mru {
+  color: var(--ok);
+}
+
+.bucket__dir-label--lru {
+  color: var(--err);
+}
+
+.bucket__nodes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
 
 .node {
   display: flex;
@@ -423,13 +517,7 @@
   font-size: 0.8rem;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
-  animation: node-appear 0.5s var(--ease-out);
   box-shadow: var(--shadow-sm);
-}
-
-@keyframes node-appear {
-  from { opacity: 0; transform: scale(0.8) translateY(20px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .node:hover {
@@ -475,6 +563,26 @@
 .node__key { color:var(--text); }
 .node__val { color:var(--muted); }
 .node__lbl { font-size:.7rem; font-weight:600; color:var(--dim); text-transform:uppercase; letter-spacing:.04em; margin-right:.15rem; }
+
+.node__lru-badge {
+  font-size: 0.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #fff;
+  background: var(--err);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+  animation: pulse-lru 2s ease-in-out infinite;
+}
+
+@keyframes pulse-lru {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.65; transform: scale(0.95); }
+}
 
 /* Eviction notice (visualizer) */
 .evict-banner { margin-top:1rem; padding:.85rem 1rem; background:var(--err-bg); border:1px solid var(--err); border-radius:var(--r-sm); color:var(--err); }

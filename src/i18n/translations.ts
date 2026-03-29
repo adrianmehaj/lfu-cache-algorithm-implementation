@@ -57,12 +57,12 @@ const en: MessageDict = {
     noMatch: 'No rows match your search',
     evictedTitle: 'Evicted key',
     evictedHint:
-      'The cache was full, so one entry had to be removed. Under LFU, the removed key had the smallest access count. If several keys shared that count, the one touched longest ago was removed (LRU tie-break within the same frequency).',
+      'The cache was full, so one entry had to be removed. The pair (Key: {key}, Value: {value}) was removed. Under LFU, the removed key had the smallest access count. If several keys shared that count, the one touched longest ago was removed (LRU tie-break within the same frequency).',
   },
   log: {
     title: 'Operation log',
     empty: 'No operations recorded yet',
-    evict: 'EVICT — key {key}',
+    evict: 'EVICT — key {key} (Value: {value})',
     put: 'PUT({key}, {value})',
     putUpdate: 'PUT({key}, {value}) [value updated]',
     get: 'GET({key}) → {result}',
@@ -162,12 +162,12 @@ const sq: MessageDict = {
     noMatch: 'Asnjë rresht nuk përputhet me kërkimin',
     evictedTitle: 'Çelësi i dëbuar nga memoria',
     evictedHint:
-      'Memoria ishte plot, prandaj duhej hequr një element. Sipas LFU-së, u hoq çelësi me numrin më të vogël të akseseve. Nëse disa çelësa kishin të njëjtën frekuencë, u hoq ai që nuk ishte prekur më gjatë (barazimi LRU brenda së njëjtës frekuencë).',
+      'Memoria ishte plot, prandaj duhej hequr një element. U hoq çifti (Çelësi: {key}, Vlera: {value}). Sipas LFU-së, u hoq çelësi me numrin më të vogël të akseseve. Nëse disa çelësa kishin të njëjtën frekuencë, u hoq ai që nuk ishte prekur më gjatë (barazimi LRU brenda së njëjtës frekuencë).',
   },
   log: {
     title: 'Regjistri i veprimeve',
     empty: 'Ende nuk është regjistruar asnjë veprim',
-    evict: 'DËBIM — çelësi {key}',
+    evict: 'DËBIM — çelësi {key} (Vlera: {value})',
     put: 'VENDOS({key}, {value})',
     putUpdate: 'VENDOS({key}, {value}) [vlera e përditësuar]',
     get: 'GET({key}) → {result}',

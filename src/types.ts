@@ -20,10 +20,11 @@ export interface Highlight {
   accessedKey: number | null;
   updatedKey: number | null;
   evictedKey: number | null;
+  evictedValue: number | null;
 }
 
 export const emptyHighlight = (): Highlight => ({
-  insertedKey: null, accessedKey: null, updatedKey: null, evictedKey: null,
+  insertedKey: null, accessedKey: null, updatedKey: null, evictedKey: null, evictedValue: null,
 });
 
 /* ── Operation Log (structured for i18n) ── */
@@ -31,7 +32,7 @@ export const emptyHighlight = (): Highlight => ({
 export type LogEntry =
   | { id: string; type: 'put'; key: number; value: number; update: boolean }
   | { id: string; type: 'get'; key: number; result: number; hit: boolean }
-  | { id: string; type: 'evict'; key: number };
+  | { id: string; type: 'evict'; key: number; value: number };
 
 /* ── Stats ── */
 

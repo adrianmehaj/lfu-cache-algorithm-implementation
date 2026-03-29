@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { LFUCache } from '../core/LFUCache';
+import { LFUCache } from '../core/LFUCacheAlgorithm';
 import type { CacheSnapshot, Highlight, LogEntry, Stats } from '../types';
 import { emptyHighlight, emptyStats } from '../types';
 import { useI18n } from '../i18n/I18nContext';
@@ -17,10 +17,6 @@ function snap(c: LFUCache, hl: Highlight): CacheSnapshot {
   };
 }
 
-function allKeys(c: LFUCache): Set<number> {
-  return new Set(c.getState().freqBuckets.flatMap((b) => b.nodes.map((n) => n.key)));
-}
-
 export function useLFUCache(initCap = 2) {
   const { t } = useI18n();
   const cacheRef = useRef(new LFUCache(initCap));
@@ -32,7 +28,7 @@ export function useLFUCache(initCap = 2) {
   const [demoActive, setDemoActive] = useState(false);
   const [demoMessage, setDemoMessage] = useState<string | null>(null);
   const [demoFocus, setDemoFocus] = useState<'modal' | 'viz' | 'logs' | null>(null);
-  const [recordedActions, setRecordedActions] = useState<Array<{ op: 'put' | 'get'; k: number; v?: number; cap: number; type: 'put' | 'update' | 'evict' | 'hit' | 'miss'; old?: number }>>([]);
+  const [recordedActions, setRecordedActions] = useState<Array<{ op: 'put' | 'get'; k: number; v?: number; cap: number; type: 'put' | 'update' | 'evict' | 'hit' | 'miss'; old?: number; oldVal?: number }>>([]);
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const clearAllTimeouts = useCallback(() => {
@@ -51,51 +47,46 @@ export function useLFUCache(initCap = 2) {
     { op: 'put' as const, k: 1, v: 1, msgKey: 'demo.put' },
     { op: 'put' as const, k: 2, v: 2, msgKey: 'demo.putFull' },
     { op: 'get' as const, k: 1, msgKey: 'demo.getFreq', vars: { f1: 1, f2: 2 } },
-    { op: 'put' as const, k: 3, v: 3, msgKey: 'demo.evict', vars: { old: 2, f: 1 } },
+    { op: 'put' as const, k: 3, v: 3, msgKey: 'demo.evict', vars: { old: 2, oldVal: 2, f: 1 } },
     { op: 'get' as const, k: 2, msgKey: 'demo.miss' },
     { op: 'get' as const, k: 3, msgKey: 'demo.get', vars: { f: 2 } },
-    { op: 'put' as const, k: 4, v: 4, msgKey: 'demo.tieBreak', vars: { old: 1, f: 2 } },
+    { op: 'put' as const, k: 4, v: 4, msgKey: 'demo.tieBreak', vars: { old: 1, oldVal: 1, f: 2 } },
     { op: 'get' as const, k: 1, msgKey: 'demo.missEvict', vars: { new: 4 } },
     { op: 'get' as const, k: 3, msgKey: 'demo.get', vars: { f: 3 } },
     { op: 'get' as const, k: 4, msgKey: 'demo.get', vars: { f: 2 } },
   ];
 
   const put = useCallback((key: number, value: number) => {
+    if (demoActive) stopDemo();
     const c = cacheRef.current;
-    const before = allKeys(c);
-    const isUpdate = before.has(key);
-    c.put(key, value);
-    const after = allKeys(c);
-
-    let evictedKey: number | null = null;
-    if (!isUpdate) {
-      for (const k of before) {
-        if (!after.has(k)) { evictedKey = k; break; }
-      }
-    }
+    const isUpdate = c.getState().freqBuckets.some(b => b.nodes.some(n => n.key === key));
+    const { evicted } = c.put(key, value);
 
     setRecordedActions(p => [...p, { 
       op: 'put', k: key, v: value, cap: capacity,
-      type: isUpdate ? 'update' : (evictedKey != null ? 'evict' : 'put'),
-      old: evictedKey ?? undefined
+      type: isUpdate ? 'update' : (evicted ? 'evict' : 'put'),
+      old: evicted?.key,
+      oldVal: evicted?.value
     }]);
 
     const hl: Highlight = {
       insertedKey: isUpdate ? null : key,
       updatedKey: isUpdate ? key : null,
       accessedKey: null,
-      evictedKey,
+      evictedKey: evicted?.key ?? null,
+      evictedValue: evicted?.value ?? null,
     };
     setSnap(snap(c, hl));
 
     const newLogs: LogEntry[] = [];
-    if (evictedKey != null) newLogs.push({ id: uid(), type: 'evict', key: evictedKey });
+    if (evicted) newLogs.push({ id: uid(), type: 'evict', key: evicted.key, value: evicted.value });
     newLogs.push({ id: uid(), type: 'put', key, value, update: isUpdate });
     setLogs((p) => [...p, ...newLogs]);
-    setStats((s) => ({ ...s, puts: s.puts + 1, evictions: s.evictions + (evictedKey != null ? 1 : 0) }));
-  }, [capacity]);
+    setStats((s) => ({ ...s, puts: s.puts + 1, evictions: s.evictions + (evicted ? 1 : 0) }));
+  }, [capacity, demoActive, stopDemo]);
 
   const get = useCallback((key: number) => {
+    if (demoActive) stopDemo();
     const result = cacheRef.current.get(key);
     const hit = result !== -1;
 
@@ -108,7 +99,7 @@ export function useLFUCache(initCap = 2) {
     setLogs((p) => [...p, { id: uid(), type: 'get', key, result, hit }]);
     setStats((s) => ({ ...s, gets: s.gets + 1, hits: s.hits + (hit ? 1 : 0), misses: s.misses + (hit ? 0 : 1) }));
     return result;
-  }, [capacity]);
+  }, [capacity, demoActive, stopDemo]);
 
   const reset = useCallback(() => {
     cacheRef.current.reset(capacity);
@@ -157,29 +148,23 @@ export function useLFUCache(initCap = 2) {
 
           const t2 = setTimeout(() => {
             setDemoFocus('viz');
+            let hl: Highlight;
+            const newLogs: LogEntry[] = [];
+
             if (s.op === 'put') {
-              const c = cacheRef.current;
-              const before = allKeys(c);
-              const isUpdate = before.has(s.k);
-              c.put(s.k, s.v!);
-              const after = allKeys(c);
-              let evictedKey: number | null = null;
-              if (!isUpdate) {
-                for (const k of before) {
-                  if (!after.has(k)) { evictedKey = k; break; }
-                }
-              }
-              const hl: Highlight = { insertedKey: isUpdate ? null : s.k, updatedKey: isUpdate ? s.k : null, accessedKey: null, evictedKey };
-              setSnap(snap(c, hl));
-              setLogs((p) => [...p, ...(evictedKey != null ? [{ id: uid(), type: 'evict', key: evictedKey } as LogEntry] : []), { id: uid(), type: 'put', key: s.k, value: s.v!, update: isUpdate } as LogEntry]);
-              setStats((st) => ({ ...st, puts: st.puts + 1, evictions: st.evictions + (evictedKey != null ? 1 : 0) }));
+              const { evicted } = cacheRef.current.put(s.k, s.v!);
+              hl = { insertedKey: s.k, updatedKey: null, accessedKey: null, evictedKey: evicted?.key ?? null, evictedValue: evicted?.value ?? null };
+              if (evicted) newLogs.push({ id: uid(), type: 'evict', key: evicted.key, value: evicted.value });
+              newLogs.push({ id: uid(), type: 'put', key: s.k, value: s.v!, update: false });
             } else {
-              const res = cacheRef.current.get(s.k);
-              const hit = res !== -1;
-              setSnap(snap(cacheRef.current, { ...emptyHighlight(), accessedKey: hit ? s.k : null }));
-              setLogs((p) => [...p, { id: uid(), type: 'get', key: s.k, result: res, hit } as LogEntry]);
-              setStats((st) => ({ ...st, gets: st.gets + 1, hits: st.hits + (hit ? 1 : 0), misses: st.misses + (hit ? 0 : 1) }));
+              const result = cacheRef.current.get(s.k);
+              const hit = result !== -1;
+              hl = { insertedKey: null, updatedKey: null, accessedKey: hit ? s.k : null, evictedKey: null, evictedValue: null };
+              newLogs.push({ id: uid(), type: 'get', key: s.k, result, hit });
             }
+
+            setSnap(snap(cacheRef.current, hl));
+            setLogs((p) => [...p, ...newLogs]);
             setDemoIdx(i + 1);
           }, 3000);
           timeoutsRef.current.push(t2);
@@ -225,29 +210,23 @@ export function useLFUCache(initCap = 2) {
 
     setTimeout(() => {
       setDemoFocus('viz');
+      let hl: Highlight;
+      const newLogs: LogEntry[] = [];
+
       if (s.op === 'put') {
-        const c = cacheRef.current;
-        const before = allKeys(c);
-        const isUpdate = before.has(s.k);
-        c.put(s.k, s.v!);
-        const after = allKeys(c);
-        let evictedKey: number | null = null;
-        if (!isUpdate) {
-          for (const k of before) {
-            if (!after.has(k)) { evictedKey = k; break; }
-          }
-        }
-        const hl: Highlight = { insertedKey: isUpdate ? null : s.k, updatedKey: isUpdate ? s.k : null, accessedKey: null, evictedKey };
-        setSnap(snap(c, hl));
-        setLogs((p) => [...p, ...(evictedKey != null ? [{ id: uid(), type: 'evict', key: evictedKey } as LogEntry] : []), { id: uid(), type: 'put', key: s.k, value: s.v!, update: isUpdate } as LogEntry]);
-        setStats((st) => ({ ...st, puts: st.puts + 1, evictions: st.evictions + (evictedKey != null ? 1 : 0) }));
+        const { evicted } = cacheRef.current.put(s.k, s.v!);
+        hl = { insertedKey: s.k, updatedKey: null, accessedKey: null, evictedKey: evicted?.key ?? null, evictedValue: evicted?.value ?? null };
+        if (evicted) newLogs.push({ id: uid(), type: 'evict', key: evicted.key, value: evicted.value });
+        newLogs.push({ id: uid(), type: 'put', key: s.k, value: s.v!, update: false });
       } else {
-        const res = cacheRef.current.get(s.k);
-        const hit = res !== -1;
-        setSnap(snap(cacheRef.current, { ...emptyHighlight(), accessedKey: hit ? s.k : null }));
-        setLogs((p) => [...p, { id: uid(), type: 'get', key: s.k, result: res, hit } as LogEntry]);
-        setStats((st) => ({ ...st, gets: st.gets + 1, hits: st.hits + (hit ? 1 : 0), misses: st.misses + (hit ? 0 : 1) }));
+        const result = cacheRef.current.get(s.k);
+        const hit = result !== -1;
+        hl = { insertedKey: null, updatedKey: null, accessedKey: hit ? s.k : null, evictedKey: null, evictedValue: null };
+        newLogs.push({ id: uid(), type: 'get', key: s.k, result, hit });
       }
+
+      setSnap(snap(cacheRef.current, hl));
+      setLogs((p) => [...p, ...newLogs]);
       setDemoIdx((i) => i + 1);
 
       setTimeout(() => {
@@ -281,7 +260,7 @@ export function useLFUCache(initCap = 2) {
         let msg = '';
         if (s.type === 'put') msg = t('demo.customPut', { k: s.k, v: s.v ?? 0 });
         else if (s.type === 'update') msg = t('demo.customUpdate', { k: s.k, v: s.v ?? 0 });
-        else if (s.type === 'evict') msg = t('demo.customEvict', { k: s.k, old: s.old ?? 0 });
+        else if (s.type === 'evict') msg = t('demo.customEvict', { k: s.k, v: s.v ?? 0, old: s.old ?? 0, oldVal: s.oldVal ?? 0 });
         else if (s.type === 'hit') msg = t('demo.customHit', { k: s.k, v: s.v ?? 0 });
         else if (s.type === 'miss') msg = t('demo.customMiss', { k: s.k });
 
@@ -290,29 +269,23 @@ export function useLFUCache(initCap = 2) {
 
         const t2 = setTimeout(() => {
           setDemoFocus('viz');
+          let hl: Highlight;
+          const newLogs: LogEntry[] = [];
+
           if (s.op === 'put') {
-            const c = cacheRef.current;
-            const before = allKeys(c);
-            const isUpdate = before.has(s.k);
-            c.put(s.k, s.v!);
-            const after = allKeys(c);
-            let evictedKey: number | null = null;
-            if (!isUpdate) {
-              for (const k of before) {
-                if (!after.has(k)) { evictedKey = k; break; }
-              }
-            }
-            const hl: Highlight = { insertedKey: isUpdate ? null : s.k, updatedKey: isUpdate ? s.k : null, accessedKey: null, evictedKey };
-            setSnap(snap(c, hl));
-            setLogs((p) => [...p, ...(evictedKey != null ? [{ id: uid(), type: 'evict', key: evictedKey } as LogEntry] : []), { id: uid(), type: 'put', key: s.k, value: s.v!, update: isUpdate } as LogEntry]);
-            setStats((st) => ({ ...st, puts: st.puts + 1, evictions: st.evictions + (evictedKey != null ? 1 : 0) }));
+            const { evicted } = cacheRef.current.put(s.k, s.v ?? 0);
+            hl = { insertedKey: s.k, updatedKey: null, accessedKey: null, evictedKey: evicted?.key ?? null, evictedValue: evicted?.value ?? null };
+            if (evicted) newLogs.push({ id: uid(), type: 'evict', key: evicted.key, value: evicted.value });
+            newLogs.push({ id: uid(), type: 'put', key: s.k, value: s.v ?? 0, update: false });
           } else {
-            const res = cacheRef.current.get(s.k);
-            const hit = res !== -1;
-            setSnap(snap(cacheRef.current, { ...emptyHighlight(), accessedKey: hit ? s.k : null }));
-            setLogs((p) => [...p, { id: uid(), type: 'get', key: s.k, result: res, hit } as LogEntry]);
-            setStats((st) => ({ ...st, gets: st.gets + 1, hits: st.hits + (hit ? 1 : 0), misses: st.misses + (hit ? 0 : 1) }));
+            const result = cacheRef.current.get(s.k);
+            const hit = result !== -1;
+            hl = { insertedKey: null, updatedKey: null, accessedKey: hit ? s.k : null, evictedKey: null, evictedValue: null };
+            newLogs.push({ id: uid(), type: 'get', key: s.k, result, hit });
           }
+
+          setSnap(snap(cacheRef.current, hl));
+          setLogs((p) => [...p, ...newLogs]);
           setDemoIdx(i + 1);
         }, 3000);
         timeoutsRef.current.push(t2);
