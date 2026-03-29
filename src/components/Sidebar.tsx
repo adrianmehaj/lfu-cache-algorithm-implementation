@@ -11,10 +11,12 @@ interface Props {
   onReset: () => void;
   onLoadDemo: () => void;
   onStep: () => void;
+  onRunRecorded: () => void;
   hasSteps: boolean;
+  hasRecorded: boolean;
 }
 
-export function Sidebar({ capacity, size, minFreq, onCapacity, onPut, onGet, onReset, onLoadDemo, onStep, hasSteps }: Props) {
+export function Sidebar({ capacity, size, minFreq, onCapacity, onPut, onGet, onReset, onLoadDemo, onStep, onRunRecorded, hasSteps, hasRecorded }: Props) {
   const { t } = useI18n();
   const [cap, setCap] = useState(String(capacity));
   const [key, setKey] = useState('');
@@ -57,10 +59,12 @@ export function Sidebar({ capacity, size, minFreq, onCapacity, onPut, onGet, onR
             <button className="btn btn--secondary" type="submit">{t('sidebar.get')}</button>
             {getRes !== null && <span className={`result ${getRes !== -1 ? 'result--hit' : 'result--miss'}`}>{getRes === -1 ? t('sidebar.miss') : `→ ${getRes}`}</span>}
           </form>
-          <button className="btn btn--danger btn--blk btn--row" type="button" onClick={handleClear}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            {t('sidebar.clearCache')}
-          </button>
+          <div style={{ marginTop: '0.75rem' }}>
+            <button className="btn btn--danger btn--blk btn--row" type="button" onClick={handleClear}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              {t('sidebar.clearCache')}
+            </button>
+          </div>
         </div>
 
         <div className="sidebar__section">
@@ -68,6 +72,12 @@ export function Sidebar({ capacity, size, minFreq, onCapacity, onPut, onGet, onR
           <div className="sidebar__preset-list">
             <button className="btn btn--preset" type="button" onClick={onLoadDemo}>{t('sidebar.leetDemo')}</button>
             <button className="btn btn--preset" type="button" onClick={onStep} disabled={!hasSteps}>{t('sidebar.stepDemo')}</button>
+            {hasRecorded && (
+              <button className="btn btn--preset btn--recorded" type="button" onClick={onRunRecorded}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '8px' }}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                {t('sidebar.runRecorded')}
+              </button>
+            )}
           </div>
         </div>
       </div>

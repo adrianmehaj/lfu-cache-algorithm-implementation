@@ -30,7 +30,7 @@ export function BenchmarksPage() {
           <div className="field"><label>{t('bench.readRatio')}</label><input type="number" min={0} max={1} step={0.1} value={config.readRatio} onChange={(e) => set({ readRatio: Math.min(1, Math.max(0, +e.target.value || 0)) })} /></div>
           <div className="field"><label>{t('bench.workload')}</label><select value={config.workload} onChange={(e) => set({ workload: e.target.value as WorkloadType })}>{wlOpts.map((o) => <option key={o.v} value={o.v}>{t(o.tk)}</option>)}</select></div>
         </div>
-        <button className="bench-run" onClick={run} disabled={running}>
+        <button className="btn btn--primary bench-run" onClick={run} disabled={running}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
           {running ? t('bench.running') : t('bench.run')}
         </button>
