@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useI18n } from '../i18n/I18nContext';
 
 type Tab = 'visualizer' | 'benchmarks' | 'theory';
@@ -75,6 +75,40 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
     return () => mq.removeEventListener('change', close);
   }, []);
 
+  const drawerRef = useRef<HTMLElement>(null);
+  const touchRef = useRef<{ x0: number; y0: number; edge: boolean } | null>(null);
+
+  const onTouchStart = useCallback((e: TouchEvent) => {
+    const t = e.touches[0];
+    touchRef.current = { x0: t.clientX, y0: t.clientY, edge: t.clientX < 28 };
+  }, []);
+
+  const onTouchEnd = useCallback((e: TouchEvent) => {
+    const start = touchRef.current;
+    if (!start) return;
+    touchRef.current = null;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - start.x0;
+    const dy = Math.abs(t.clientY - start.y0);
+    if (dy > Math.abs(dx) * 0.75) return;
+
+    if (!drawerOpen && start.edge && dx > 60) {
+      setDrawerOpen(true);
+    } else if (drawerOpen && dx < -60) {
+      setDrawerOpen(false);
+    }
+  }, [drawerOpen]);
+
+  useEffect(() => {
+    const el = document.documentElement;
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [onTouchStart, onTouchEnd]);
+
   const selectTab = (id: Tab) => {
     onTab(id);
     setDrawerOpen(false);
@@ -85,15 +119,17 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
       <nav className="nav" aria-label="Main">
         <button
           type="button"
-          className="nav__menu-btn"
+          className={`nav__menu-btn ${drawerOpen ? 'nav__menu-btn--open' : ''}`}
           aria-expanded={drawerOpen}
           aria-controls="nav-drawer"
-          aria-label={t('nav.openMenu')}
-          onClick={() => setDrawerOpen(true)}
+          aria-label={drawerOpen ? t('nav.closeMenu') : t('nav.openMenu')}
+          onClick={() => setDrawerOpen(!drawerOpen)}
         >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-            <path d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
+          <span className="hamburger" aria-hidden>
+            <span className="hamburger__line" />
+            <span className="hamburger__line" />
+            <span className="hamburger__line" />
+          </span>
         </button>
 
         <div className="nav__brand">
@@ -157,6 +193,7 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
       />
 
       <aside
+        ref={drawerRef}
         id="nav-drawer"
         className={`nav__drawer ${drawerOpen ? 'nav__drawer--open' : ''}`}
         role="dialog"
@@ -185,9 +222,11 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
             </div>
           </div>
           <button type="button" className="nav__drawer-close" onClick={() => setDrawerOpen(false)} aria-label={t('nav.closeMenu')}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" aria-hidden>
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
+            <span className="hamburger hamburger--active" aria-hidden>
+              <span className="hamburger__line" />
+              <span className="hamburger__line" />
+              <span className="hamburger__line" />
+            </span>
           </button>
         </div>
         <nav className="nav__drawer-nav" aria-label={t('nav.menu')}>
