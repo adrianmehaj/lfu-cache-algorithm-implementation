@@ -63,7 +63,7 @@ export const BenchmarkCharts = memo(
                 <CartesianGrid {...grid} vertical={false} />
                 <XAxis dataKey="name" tick={axis} tickLine={false} axisLine={{ stroke: 'var(--border)' }} />
                 <YAxis tick={axis} tickLine={false} axisLine={false} unit=" %" domain={[0, 'auto']} />
-                <Tooltip {...tooltip} formatter={(v: number) => [`${v.toFixed(2)}%`, '']} />
+                <Tooltip {...tooltip} formatter={(v) => [`${Number(v ?? 0).toFixed(2)}%`, '']} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
                 <Bar
                   dataKey="hit"
@@ -94,7 +94,7 @@ export const BenchmarkCharts = memo(
                 <CartesianGrid {...grid} vertical={false} />
                 <XAxis dataKey="name" tick={axis} tickLine={false} axisLine={{ stroke: 'var(--border)' }} />
                 <YAxis tick={axis} tickLine={false} axisLine={false} unit=" µs" domain={[0, 'auto']} />
-                <Tooltip {...tooltip} formatter={(v: number) => [`${v.toFixed(2)} µs`, latAxisLabel]} />
+                <Tooltip {...tooltip} formatter={(v) => [`${Number(v ?? 0).toFixed(2)} µs`, latAxisLabel]} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
                 <Bar
                   dataKey="latency"

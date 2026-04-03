@@ -7,6 +7,12 @@ import { useI18n } from '../i18n/I18nContext';
 let seq = 0;
 const uid = () => `l${++seq}`;
 
+function defined(obj: Record<string, string | number | undefined>): Record<string, string | number> {
+  const out: Record<string, string | number> = {};
+  for (const [k, v] of Object.entries(obj)) if (v !== undefined) out[k] = v;
+  return out;
+}
+
 function snap(c: LFUCache, hl: Highlight): CacheSnapshot {
   const s = c.getState();
   return {
@@ -143,7 +149,7 @@ export function useLFUCache(initCap = 2) {
       sequence.forEach((s, i) => {
         const stepTime = 8000;
         const t1 = setTimeout(() => {
-          setDemoMessage(t('demo.step', { n: i + 1, msg: t(s.msgKey, { k: s.k, v: s.v ?? 0, ...s.vars }) }));
+          setDemoMessage(t('demo.step', { n: i + 1, msg: t(s.msgKey, defined({ k: s.k, v: s.v ?? 0, ...s.vars })) }));
           setDemoFocus('modal');
 
           const t2 = setTimeout(() => {
@@ -205,7 +211,7 @@ export function useLFUCache(initCap = 2) {
     }
 
     const s = sequence[demoIdx];
-    setDemoMessage(t('demo.step', { n: demoIdx + 1, msg: t(s.msgKey, { k: s.k, v: s.v ?? 0, ...s.vars }) }));
+    setDemoMessage(t('demo.step', { n: demoIdx + 1, msg: t(s.msgKey, defined({ k: s.k, v: s.v ?? 0, ...s.vars })) }));
     setDemoFocus('modal');
 
     setTimeout(() => {

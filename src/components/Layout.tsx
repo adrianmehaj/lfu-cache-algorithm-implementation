@@ -98,10 +98,17 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
 
         <div className="nav__brand">
           <span className="nav__icon" aria-hidden>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <ellipse cx="12" cy="5" rx="9" ry="3" />
-              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+            <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+              <defs>
+                <linearGradient id="nav-logo-g" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#6366f1"/>
+                  <stop offset="100%" stopColor="#06b6d4"/>
+                </linearGradient>
+              </defs>
+              <rect x="4" y="20" width="5" height="7" rx="1" fill="url(#nav-logo-g)" opacity=".85"/>
+              <rect x="10.5" y="14" width="5" height="13" rx="1" fill="url(#nav-logo-g)" opacity=".9"/>
+              <rect x="17" y="8" width="5" height="19" rx="1" fill="url(#nav-logo-g)" opacity=".95"/>
+              <rect x="23.5" y="5" width="5" height="22" rx="1" fill="url(#nav-logo-g)"/>
             </svg>
           </span>
           <span className="nav__title">{t('nav.brand')}</span>
@@ -162,10 +169,17 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
             <span className="nav__drawer-eyebrow">{t('nav.menu')}</span>
             <div className="nav__drawer-title-row">
               <span className="nav__drawer-logo" aria-hidden>
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <ellipse cx="12" cy="5" rx="9" ry="3" />
-                  <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-                  <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+                  <defs>
+                    <linearGradient id="drawer-logo-g" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#6366f1"/>
+                      <stop offset="100%" stopColor="#06b6d4"/>
+                    </linearGradient>
+                  </defs>
+                  <rect x="4" y="20" width="5" height="7" rx="1" fill="url(#drawer-logo-g)" opacity=".85"/>
+                  <rect x="10.5" y="14" width="5" height="13" rx="1" fill="url(#drawer-logo-g)" opacity=".9"/>
+                  <rect x="17" y="8" width="5" height="19" rx="1" fill="url(#drawer-logo-g)" opacity=".95"/>
+                  <rect x="23.5" y="5" width="5" height="22" rx="1" fill="url(#drawer-logo-g)"/>
                 </svg>
               </span>
               <span className="nav__drawer-brand">{t('nav.brand')}</span>
