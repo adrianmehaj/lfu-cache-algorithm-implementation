@@ -166,7 +166,6 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
       >
         <div className="nav__drawer-head">
           <div className="nav__drawer-head-main">
-            <span className="nav__drawer-eyebrow">{t('nav.menu')}</span>
             <div className="nav__drawer-title-row">
               <span className="nav__drawer-logo" aria-hidden>
                 <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
