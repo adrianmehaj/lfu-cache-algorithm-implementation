@@ -36,7 +36,6 @@ const en: MessageDict = {
     clearCache: 'Reset cache',
     presets: 'Quick scenarios',
     leetDemo: 'LeetCode — example 1',
-    stepDemo: 'LeetCode — step by step',
     runRecorded: 'Replay my actions',
   },
   viz: {
@@ -79,8 +78,6 @@ const en: MessageDict = {
     get: 'GET({k}). Key {k} accessed. Its frequency increases to {f}.',
     tieBreak: 'PUT({k}, {v}). Cache full. Key {old} is evicted (frequency {f}, but was accessed least recently — LRU tie-break).',
     done: 'Example completed successfully! ✅ You can now try your own actions.',
-    manualStart: 'Starting manual demo (Step 1)',
-    manualDone: 'Manual demo completed! ✅',
     customPut: 'Insert: Key {k} added with value {v}. Initial frequency = 1.',
     customUpdate: 'Update: Key {k} updated with value {v}. Frequency increased.',
     customEvict: 'Insert with eviction: {k} added, but {old} was evicted (lowest frequency) because cache was full.',
@@ -91,7 +88,7 @@ const en: MessageDict = {
     resume: 'Resume demo',
   },
   bench: {
-    title: 'Benchmark lab',
+    title: 'Benchmark Lab',
     subtitle: 'Compare LFU, LRU, and FIFO replacement policies on synthetic workloads.',
     capacity: 'Cache capacity',
     totalOps: 'Number of operations',
@@ -172,7 +169,6 @@ const sq: MessageDict = {
     clearCache: 'Rivendos memorien',
     presets: 'Skenarë të shpejtë',
     leetDemo: 'LeetCode — shembulli 1',
-    stepDemo: 'LeetCode — hap pas hapi',
     runRecorded: 'Riluaj veprimet e mia',
   },
   viz: {
@@ -215,8 +211,6 @@ const sq: MessageDict = {
     get: 'GET({k}). Aksesohet çelësi {k}. Frekuenca e tij rritet në {f}.',
     tieBreak: 'PUT({k}, {v}). Memoria plot. Dëbohet çelësi {old} (frekuenca {f}, por u aksesu më herët se të tjerët — LRU tie-break).',
     done: 'Shembulli përfundoi me sukses! ✅ Tani mund të provoni veprimet tuaja.',
-    manualStart: 'Nisja e demonstrimit manual (Hapi 1)',
-    manualDone: 'Demonstrimi manual përfundoi! ✅',
     customPut: 'Shtim: U shtua çelësi {k} me vlerë {v}. Frekuenca fillestare = 1.',
     customUpdate: 'Përditësim: Çelësi {k} u përditësua me vlerën {v}. Frekuenca u rrit.',
     customEvict: 'Shtim me dëbim: U shtua {k}, por u dëbua {old} (frekuenca më e ulët) sepse memoria ishte plot.',

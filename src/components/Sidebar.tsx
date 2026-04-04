@@ -10,13 +10,11 @@ interface Props {
   onGet: (k: number) => number;
   onReset: () => void;
   onLoadDemo: () => void;
-  onStep: () => void;
   onRunRecorded: () => void;
-  hasSteps: boolean;
   hasRecorded: boolean;
 }
 
-export function Sidebar({ capacity, size, minFreq, onCapacity, onPut, onGet, onReset, onLoadDemo, onStep, onRunRecorded, hasSteps, hasRecorded }: Props) {
+export function Sidebar({ capacity, size, minFreq, onCapacity, onPut, onGet, onReset, onLoadDemo, onRunRecorded, hasRecorded }: Props) {
   const { t } = useI18n();
   const [cap, setCap] = useState(String(capacity));
   const [key, setKey] = useState('');
@@ -71,7 +69,6 @@ export function Sidebar({ capacity, size, minFreq, onCapacity, onPut, onGet, onR
           <h3 className="sidebar__heading">{t('sidebar.presets')}</h3>
           <div className="sidebar__preset-list">
             <button className="btn btn--preset" type="button" onClick={onLoadDemo}>{t('sidebar.leetDemo')}</button>
-            <button className="btn btn--preset" type="button" onClick={onStep} disabled={!hasSteps}>{t('sidebar.stepDemo')}</button>
             {hasRecorded && (
               <button className="btn btn--preset btn--recorded" type="button" onClick={onRunRecorded}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '8px' }}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>

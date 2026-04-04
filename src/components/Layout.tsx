@@ -47,9 +47,21 @@ function DrawerTabIcon({ tab }: { tab: Tab }) {
   }
 }
 
+/** Fired when the slide-out nav opens on a narrow viewport; Visualizer stops any running demo. */
+export const LFU_NAV_DRAWER_OPEN_EVENT = 'lfu-nav-drawer-open';
+
 export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
   const { locale, setLocale, t } = useI18n();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const prevDrawerOpenRef = useRef(false);
+
+  useEffect(() => {
+    const isMobileNav = () => typeof window !== 'undefined' && !window.matchMedia('(min-width: 900px)').matches;
+    if (drawerOpen && !prevDrawerOpenRef.current && isMobileNav()) {
+      window.dispatchEvent(new CustomEvent(LFU_NAV_DRAWER_OPEN_EVENT));
+    }
+    prevDrawerOpenRef.current = drawerOpen;
+  }, [drawerOpen]);
 
   useEffect(() => {
     if (!drawerOpen) return;

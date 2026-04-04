@@ -1,4 +1,13 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import { translate, type Locale } from './translations';
 
 const STORAGE_KEY = 'lfu-visualizer-locale';
@@ -14,15 +23,17 @@ interface I18nValue {
 const I18nContext = createContext<I18nValue | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(() => {
+  /** Default English; hydrate saved choice before first paint (see useLayoutEffect). */
+  const [locale, setLocaleState] = useState<Locale>('en');
+
+  useLayoutEffect(() => {
     try {
       const s = localStorage.getItem(STORAGE_KEY) as Locale | null;
-      if (s === 'en' || s === 'sq') return s;
+      if (s === 'en' || s === 'sq') setLocaleState(s);
     } catch {
       /* ignore */
     }
-    return 'en';
-  });
+  }, []);
 
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);

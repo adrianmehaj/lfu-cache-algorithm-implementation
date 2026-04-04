@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { Sidebar } from '../components/Sidebar';
+import { LFU_NAV_DRAWER_OPEN_EVENT } from '../components/Layout';
 import { FrequencyView } from '../components/FrequencyView';
 import { CacheTable } from '../components/CacheTable';
 import { EventLog } from '../components/EventLog';
@@ -22,20 +23,18 @@ export function VisualizerPage() {
     reset,
     setCapacity,
     loadDemo,
-    stepDemo,
     runRecordedDemo,
     stopDemo,
+    interruptActiveDemoForMobileNav,
     pauseDemo,
     resumeDemo,
     capacity,
     snapshot,
     logs,
-    hasMoreDemoSteps,
     demoMessage,
     demoActive,
     demoPaused,
     demoFocus,
-    demoRunKind,
     hasRecordedActions,
   } = useLFUCache(2);
 
@@ -67,6 +66,12 @@ export function VisualizerPage() {
     },
     []
   );
+
+  useEffect(() => {
+    const onDrawerOpen = () => interruptActiveDemoForMobileNav();
+    window.addEventListener(LFU_NAV_DRAWER_OPEN_EVENT, onDrawerOpen);
+    return () => window.removeEventListener(LFU_NAV_DRAWER_OPEN_EVENT, onDrawerOpen);
+  }, [interruptActiveDemoForMobileNav]);
 
   const isDemoCountdown =
     demoActive && demoMessage != null && /^[321]$/.test(String(demoMessage).trim());
@@ -136,14 +141,13 @@ export function VisualizerPage() {
           </button>
         </div>
       )}
-      <div className={`viz-rail viz-rail--left ${demoActive && demoRunKind !== 'manual' ? 'demo-dim' : ''}`}>
+      <div className={`viz-rail viz-rail--left ${demoActive ? 'demo-dim' : ''}`}>
         <div className="viz-rail-stack">
           <Sidebar
             capacity={capacity} size={snapshot.size} minFreq={snapshot.minFreq}
             onCapacity={setCapacity} onPut={put} onGet={get}
-            onReset={reset} onLoadDemo={loadDemo} onStep={stepDemo}
+            onReset={reset} onLoadDemo={loadDemo}
             onRunRecorded={runRecordedDemo}
-            hasSteps={hasMoreDemoSteps}
             hasRecorded={hasRecordedActions}
           />
         </div>

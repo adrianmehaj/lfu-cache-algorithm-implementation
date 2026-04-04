@@ -18,11 +18,6 @@ const DEMO_AFTER_COUNTDOWN_MS = 3 * DEMO_COUNTDOWN_TICK_MS + 400;
 const DEMO_DONE_HOLD_MS = 6_500;
 const DEMO_RECORDED_DONE_MS = 5_500;
 
-/** Manual “Step” button: longer beats so each phase is readable. */
-const DEMO_MANUAL_MODAL_MS = 4_500;
-const DEMO_MANUAL_VIZ_MS = 4_500;
-const DEMO_MANUAL_LOGS_MS = 3_500;
-
 const VIZ_SEGMENT_MS = DEMO_FOCUS_LOGS_MS - DEMO_REVEAL_VIZ_MS;
 const LOGS_SEGMENT_MS = DEMO_STEP_MS - DEMO_FOCUS_LOGS_MS;
 const LAST_COUNTDOWN_SEGMENT_MS = DEMO_AFTER_COUNTDOWN_MS - 2 * DEMO_COUNTDOWN_TICK_MS;
@@ -43,8 +38,7 @@ function snap(c: LFUCache, hl: Highlight): CacheSnapshot {
   };
 }
 
-type DemoKind = 'load' | 'recorded' | 'manual';
-type DemoRunKind = 'idle' | DemoKind;
+type DemoKind = 'load' | 'recorded';
 
 type PauseSnapshot = {
   kind: DemoKind;
@@ -80,12 +74,11 @@ export function useLFUCache(initCap = 2) {
   const [snapshot, setSnap] = useState<CacheSnapshot>(() => snap(cacheRef.current, emptyHighlight()));
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [stats, setStats] = useState<Stats>(emptyStats);
-  const [demoIdx, setDemoIdx] = useState(0);
+  const [, setDemoIdx] = useState(0);
   const [demoActive, setDemoActive] = useState(false);
   const [demoPaused, setDemoPaused] = useState(false);
   const [demoMessage, setDemoMessage] = useState<string | null>(null);
   const [demoFocus, setDemoFocus] = useState<'modal' | 'viz' | 'logs' | null>(null);
-  const [demoRunKind, setDemoRunKind] = useState<DemoRunKind>('idle');
   const [recordedActions, setRecordedActions] = useState<
     Array<{
       op: 'put' | 'get';
@@ -175,7 +168,6 @@ export function useLFUCache(initCap = 2) {
       demoPhaseRef.current = 'idle';
       demoKindRef.current = 'idle';
       demoSegmentEndsAtRef.current = null;
-      setDemoRunKind('idle');
     }, DEMO_DONE_HOLD_MS);
   }, [markSegment, pushTimeout]);
 
@@ -258,7 +250,6 @@ export function useLFUCache(initCap = 2) {
               demoPhaseRef.current = 'idle';
               demoKindRef.current = 'idle';
               demoSegmentEndsAtRef.current = null;
-              setDemoRunKind('idle');
             }, DEMO_RECORDED_DONE_MS);
           }, DEMO_STEP_MS);
         }
@@ -335,7 +326,6 @@ export function useLFUCache(initCap = 2) {
           demoPhaseRef.current = 'idle';
           demoKindRef.current = 'idle';
           demoSegmentEndsAtRef.current = null;
-          setDemoRunKind('idle');
         }, rem);
         return;
       }
@@ -418,7 +408,6 @@ export function useLFUCache(initCap = 2) {
             demoPhaseRef.current = 'idle';
             demoKindRef.current = 'idle';
             demoSegmentEndsAtRef.current = null;
-            setDemoRunKind('idle');
           }, DEMO_RECORDED_DONE_MS);
         };
 
@@ -519,6 +508,12 @@ export function useLFUCache(initCap = 2) {
     pauseSnapshotRef.current = null;
   }, [clearAllTimeouts]);
 
+  /** Stops LeetCode demo or “Replay my actions” when the mobile nav drawer opens. */
+  const interruptActiveDemoForMobileNav = useCallback(() => {
+    if (!demoActive) return;
+    stopDemo();
+  }, [demoActive, stopDemo]);
+
   const put = useCallback(
     (key: number, value: number) => {
       if (demoActive) stopDemo();
@@ -600,7 +595,6 @@ export function useLFUCache(initCap = 2) {
     setDemoActive(true);
     setDemoPaused(false);
     demoKindRef.current = 'load';
-    setDemoRunKind('load');
 
     cacheRef.current = new LFUCache(2);
     setCapState(2);
@@ -628,74 +622,12 @@ export function useLFUCache(initCap = 2) {
     pushTimeout(() => scheduleLoadMainLoop(0, 0), DEMO_AFTER_COUNTDOWN_MS);
   }, [stopDemo, markSegment, pushTimeout, scheduleLoadMainLoop]);
 
-  const stepDemo = useCallback(() => {
-    if (demoIdx >= DEMO_SEQUENCE.length) {
-      stopDemo();
-      cacheRef.current = new LFUCache(2);
-      setCapState(2);
-      setLogs([]);
-      setStats(emptyStats);
-      setDemoIdx(0);
-      setDemoMessage(t('demo.manualStart'));
-      pushTimeout(() => setDemoMessage(null), 3_000);
-      return;
-    }
-
-    setDemoActive(true);
-    setDemoPaused(false);
-    demoKindRef.current = 'manual';
-    setDemoRunKind('manual');
-
-    const s = DEMO_SEQUENCE[demoIdx];
-    const stepIndex = demoIdx;
-    setDemoMessage(t('demo.step', { n: demoIdx + 1, msg: t(s.msgKey, defined({ k: s.k, v: s.v ?? 0, ...s.vars })) }));
-    setDemoFocus('modal');
-
-    pushTimeout(() => {
-      setDemoFocus('viz');
-      let hl: Highlight;
-      const newLogs: LogEntry[] = [];
-
-      if (s.op === 'put') {
-        const { evicted } = cacheRef.current.put(s.k, s.v!);
-        hl = { insertedKey: s.k, updatedKey: null, accessedKey: null, evictedKey: evicted?.key ?? null, evictedValue: evicted?.value ?? null };
-        if (evicted) newLogs.push({ id: uid(), type: 'evict', key: evicted.key, value: evicted.value });
-        newLogs.push({ id: uid(), type: 'put', key: s.k, value: s.v!, update: false });
-      } else {
-        const result = cacheRef.current.get(s.k);
-        const hit = result !== -1;
-        hl = { insertedKey: null, updatedKey: null, accessedKey: hit ? s.k : null, evictedKey: null, evictedValue: null };
-        newLogs.push({ id: uid(), type: 'get', key: s.k, result, hit });
-      }
-
-      setSnap(snap(cacheRef.current, hl));
-      setLogs((p) => [...p, ...newLogs]);
-      setDemoIdx((i) => i + 1);
-
-      pushTimeout(() => {
-        setDemoFocus('logs');
-        pushTimeout(() => {
-          setDemoFocus(null);
-          if (stepIndex + 1 === DEMO_SEQUENCE.length) {
-            setDemoMessage(t('demo.manualDone'));
-            pushTimeout(() => {
-              setDemoMessage(null);
-              setDemoActive(false);
-              demoKindRef.current = 'idle';
-            }, 4_500);
-          }
-        }, DEMO_MANUAL_LOGS_MS);
-      }, DEMO_MANUAL_VIZ_MS);
-    }, DEMO_MANUAL_MODAL_MS);
-  }, [demoIdx, t, pushTimeout, stopDemo]);
-
   const runRecordedDemo = useCallback(() => {
     if (recordedActions.length === 0) return;
     stopDemo();
     setDemoActive(true);
     setDemoPaused(false);
     demoKindRef.current = 'recorded';
-    setDemoRunKind('recorded');
 
     const startCap = recordedActions[0].cap;
     cacheRef.current = new LFUCache(startCap);
@@ -736,22 +668,19 @@ export function useLFUCache(initCap = 2) {
     reset,
     setCapacity,
     loadDemo,
-    stepDemo,
     runRecordedDemo,
     stopDemo,
+    interruptActiveDemoForMobileNav,
     pauseDemo,
     resumeDemo,
     capacity,
     snapshot,
     logs,
     stats,
-    hasMoreDemoSteps: demoIdx < DEMO_SEQUENCE.length,
-    demoStepIndex: demoIdx,
     demoMessage,
     demoActive,
     demoPaused,
     demoFocus,
-    demoRunKind,
     hasRecordedActions: recordedActions.length > 0,
   };
 }

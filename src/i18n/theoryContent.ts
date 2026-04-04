@@ -17,7 +17,7 @@ export interface TheoryBundle {
 }
 
 const en: TheoryBundle = {
-  title: 'LFU cache — theory',
+  title: 'LFU cache',
   subtitle:
     'From caching basics to O(1) LFU, plus LRU and FIFO as comparison policies — including the same trio used in the benchmark lab.',
   sections: [
@@ -109,7 +109,7 @@ Evict → B   (LRU within freq=1)`,
 };
 
 const sq: TheoryBundle = {
-  title: 'Memoria përkohëse LFU — teoria',
+  title: 'Memoria përkohëse LFU',
   subtitle:
     'Nga bazat e cache-it te LFU O(1), plus LRU dhe FIFO si politika krahasimi — i njëjti tresh në laboratorin e benchmark-ut.',
   sections: [
