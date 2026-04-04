@@ -1,22 +1,3 @@
-// =============================================================================
-//  LFU Cache — LeetCode 460
-//  https://leetcode.com/problems/lfu-cache/
-//
-//  Kompleksiteti: get O(1) | put O(1) | hapësira O(capacity)
-//
-//  Struktura e të dhënave:
-//    keyMap  : Map<key, LFUNode>               — kërkim i shpejtë i nyjes
-//    freqMap : Map<freq, FreqBucket>           — grupim sipas frekuencës
-//
-//  Brenda çdo liste: head.next = MRU (i aksesuar së fundmi)
-//                    tail.prev = LRU (kandidati për dëbim)
-//
-//  ► Për LeetCode: kopjo gjithçka dhe ngjite direkt (TypeScript).
-//  ► Për projektin: importo { LFUCache } from './LFUCacheAlgorithm'.
-// =============================================================================
-
-
-// ─── 1. LFUNode ──────────────────────────────────────────────────────────────
 
 export class LFUNode {
   key:   number;

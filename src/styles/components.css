@@ -246,6 +246,13 @@
   box-shadow: var(--shadow-lg);
 }
 
+/* Keep left accent rail on hover (border-color above would wash it out) */
+.viz-main > .card:hover,
+.page > .card:hover,
+.viz-rail-card:hover {
+  border-left-color: var(--accent);
+}
+
 /* Accent rail — top-level section cards only */
 .viz-layout .card {
   padding: 1rem;
@@ -352,20 +359,23 @@
 
 .sidebar__get-row {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
-.sidebar__get-row .btn {
-  flex: 0 0 auto;
+.sidebar__get-row .sidebar__get-btn.btn--blk {
+  width: 100%;
+  margin-top: 0;
 }
 
 .sidebar__get-row .result {
-  flex: 1;
   font-weight: 700;
   font-size: 0.9rem;
+  text-align: center;
+  width: 100%;
 }
 .input {
   padding: 0.6rem 1rem;
@@ -707,6 +717,12 @@
 }
 .bench-table th,.bench-table td { padding:.65rem .75rem; text-align:left; border-bottom:1px solid var(--border-sub); }
 .bench-table th { font-size:.75rem; font-weight:600; color:var(--muted); text-transform:uppercase; }
+.bench-table th.bench-th--hint {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--border-hover);
+}
 .bench-table tbody tr:hover { background:var(--bg-input); }
 .bench-hit  { color:var(--ok); font-weight:500; }
 .bench-miss { color:var(--warn); font-weight:500; }
@@ -734,6 +750,10 @@
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
+  padding-top: clamp(0.95rem, 8vmin, 
+9.25rem);
+  padding-bottom: 0.1rem;
+
   background: rgba(5, 6, 9, 0.55);
   backdrop-filter: blur(4px);
   z-index: 2;
@@ -748,7 +768,7 @@
   border: 3px solid var(--border);
   border-top-color: var(--accent);
   border-radius: 50%;
-  animation: bench-spin 0.8s linear infinite;
+  animation: bench-spin var(--bench-spin-dur, 0.8s) linear infinite;
 }
 @keyframes bench-spin {
   to { transform: rotate(360deg); }
@@ -765,17 +785,29 @@
   width: 35%;
   background: linear-gradient(90deg, var(--accent), var(--accent-h));
   border-radius: 999px;
-  animation: bench-indet 1.2s ease-in-out infinite;
+  animation: bench-indet var(--bench-indet-dur, 1.2s) ease-in-out infinite;
 }
 @keyframes bench-indet {
   0% { transform: translateX(-100%); width: 40%; }
   50% { transform: translateX(80%); width: 55%; }
   100% { transform: translateX(300%); width: 40%; }
 }
-.bench-loading__text {
-  font-size: 0.8rem;
-  font-weight: 600;
+.bench-loading__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--text);
+}
+.bench-loading__sub {
+  margin: 0;
+  max-width: 22rem;
+  padding: 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--muted);
+  text-align: center;
 }
 
 .bench-run {
@@ -808,6 +840,13 @@
   letter-spacing: 0.08em;
   color: var(--dim);
 }
+.bench-summary__label--hint {
+  cursor: help;
+  width: fit-content;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--border-hover);
+}
 .bench-summary__value {
   font-size: 1.15rem;
   font-weight: 800;
@@ -823,13 +862,8 @@
 
 .bench-export-table {
   margin-bottom: 1.25rem;
-}
-.bench-export-table__hint {
-  margin: 0.5rem 0 0;
-  font-size: 0.8rem;
-  color: var(--muted);
-  line-height: 1.45;
-  max-width: 48ch;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-sub);
 }
 
 .bench-export-charts {
@@ -904,10 +938,28 @@
 .bench-chart-panel__title {
   margin-bottom: 0;
 }
+.bench-chart-panel__title--hint {
+  cursor: help;
+  width: fit-content;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--border-hover);
+}
 .bench-chart-panel__inner {
   width: 100%;
   min-height: 240px;
 }
+
+/* Recharts: no full-width category hover band — only per-bar activeBar */
+.bench-chart-panel__inner .recharts-tooltip-cursor,
+.bench-chart-panel__inner .recharts-active-shape ~ .recharts-tooltip-cursor {
+  display: none !important;
+}
+.bench-chart-panel__inner .recharts-rectangle.recharts-tooltip-cursor {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
 .bench-charts-outer {
   padding: 1rem 1.25rem;
 }

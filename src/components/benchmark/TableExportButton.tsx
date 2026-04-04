@@ -6,6 +6,7 @@ import { exportBenchmarkExcel } from '../../utils/benchmarkExcel';
 
 interface Props {
   results: BenchmarkResult[];
+  sectionTitle: string;
   label: string;
   hint: string;
   headers: {
@@ -20,7 +21,7 @@ interface Props {
 
 const btnMotion = { whileHover: { scale: 1.02 }, whileTap: { scale: 0.98 }, transition: { duration: 0.2 } };
 
-export const TableExportButton = memo(function TableExportButton({ results, label, hint, headers, sheetName }: Props) {
+export const TableExportButton = memo(function TableExportButton({ results, sectionTitle, label, hint, headers, sheetName }: Props) {
   const [busy, setBusy] = useState(false);
 
   const onExport = useCallback(async () => {
@@ -35,17 +36,22 @@ export const TableExportButton = memo(function TableExportButton({ results, labe
 
   return (
     <div className="bench-export-table">
-      <motion.button
-        type="button"
-        className="btn btn--primary bench-export-btn"
-        {...btnMotion}
-        onClick={onExport}
-        disabled={busy}
-        title={hint}
-      >
-        {label}
-      </motion.button>
-      <p className="bench-export-table__hint">{hint}</p>
+      <p className="bench-export__intro">{sectionTitle}</p>
+      <div className="bench-export-row bench-export-row--charts">
+        <motion.button
+          type="button"
+          className="btn btn--secondary bench-export-btn"
+          {...btnMotion}
+          onClick={onExport}
+          disabled={busy}
+          title={hint}
+        >
+          {label}
+        </motion.button>
+      </div>
+      <p className="bench-export__hints">
+        <span className="bench-export__hint">{hint}</span>
+      </p>
     </div>
   );
 });

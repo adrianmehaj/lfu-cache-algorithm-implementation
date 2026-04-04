@@ -56,7 +56,7 @@ export function Sidebar({ capacity, size, minFreq, onCapacity, onPut, onGet, onR
             <button className="btn btn--primary btn--blk" type="submit">{t('sidebar.put')}</button>
           </form>
           <form onSubmit={handleGet} className="sidebar__get-row">
-            <button className="btn btn--secondary" type="submit">{t('sidebar.get')}</button>
+            <button className="btn btn--secondary btn--blk sidebar__get-btn" type="submit">{t('sidebar.get')}</button>
             {getRes !== null && <span className={`result ${getRes !== -1 ? 'result--hit' : 'result--miss'}`}>{getRes === -1 ? t('sidebar.miss') : `→ ${getRes}`}</span>}
           </form>
           <div style={{ marginTop: '0.75rem' }}>

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, type CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBenchmark } from '../hooks/useBenchmark';
 import type { WorkloadType } from '../types';
@@ -38,6 +38,14 @@ export function BenchmarksPage() {
     totalTime: t('bench.totalTime'),
   };
 
+  const tableTooltips = {
+    policy: t('bench.ttPolicy'),
+    hitRate: t('bench.ttHitRate'),
+    missRate: t('bench.ttMissRate'),
+    avgLatency: t('bench.ttAvgLatency'),
+    totalTime: t('bench.ttTotalTime'),
+  };
+
   const chartExportLabels = {
     exportPng: t('bench.exportPng'),
     exportSvg: t('bench.exportSvg'),
@@ -52,7 +60,19 @@ export function BenchmarksPage() {
   const summaryLabels = {
     bestHit: t('bench.summaryBestHit'),
     fastest: t('bench.summaryFastest'),
+    ttBestHit: t('bench.ttSummaryBestHit'),
+    ttFastest: t('bench.ttSummaryFastest'),
   };
+
+  /** Slower motion for larger workloads — matches minLoaderMs in useBenchmark. */
+  const benchLoadingStyle = (
+    running
+      ? {
+          ['--bench-spin-dur' as string]: `${0.68 + Math.min(1.05, config.totalOps / 85_000)}s`,
+          ['--bench-indet-dur' as string]: `${0.95 + Math.min(1.5, config.totalOps / 60_000)}s`,
+        }
+      : undefined
+  ) as CSSProperties | undefined;
 
   return (
     <div className="page bench-page">
@@ -107,12 +127,13 @@ export function BenchmarksPage() {
             </div>
           </div>
           {running && (
-            <div className="bench-loading" aria-busy="true">
+            <div className="bench-loading" style={benchLoadingStyle} aria-busy="true" aria-live="polite">
               <div className="bench-loading__spinner" />
-              <div className="bench-loading__bar" role="progressbar" aria-valuetext={t('bench.running')}>
+              <p className="bench-loading__title">{t('bench.loading')}</p>
+              <div className="bench-loading__bar" role="progressbar" aria-valuetext={t('bench.loading')}>
                 <div className="bench-loading__bar-fill" />
               </div>
-              <span className="bench-loading__text">{t('bench.running')}</span>
+              <p className="bench-loading__sub">{t('bench.loadingSub')}</p>
             </div>
           )}
         </div>
@@ -126,7 +147,7 @@ export function BenchmarksPage() {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
             <path d="M8 5v14l11-7z" />
           </svg>
-          {running ? t('bench.running') : t('bench.run')}
+          {running ? t('bench.loading') : t('bench.run')}
         </motion.button>
       </div>
 
@@ -137,6 +158,7 @@ export function BenchmarksPage() {
           <motion.div className="card page__card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.35 }}>
             <TableExportButton
               results={results}
+              sectionTitle={t('bench.sectionSpreadsheet')}
               label={t('bench.exportExcel')}
               hint={t('bench.exportExcelHint')}
               headers={tableHeaders}
@@ -145,6 +167,7 @@ export function BenchmarksPage() {
             <BenchmarkTable
               results={results}
               labels={tableHeaders}
+              tooltips={tableTooltips}
             />
           </motion.div>
 
@@ -155,6 +178,8 @@ export function BenchmarksPage() {
               results={results}
               hitTitle={t('bench.hitChart')}
               latTitle={t('bench.latChart')}
+              hitTitleHint={t('bench.ttHitChart')}
+              latTitleHint={t('bench.ttLatChart')}
               hitLabel={t('bench.chartHit')}
               missLabel={t('bench.chartMiss')}
               latAxisLabel={t('bench.avgLatency')}

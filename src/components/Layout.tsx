@@ -221,7 +221,12 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
               <span className="nav__drawer-brand">{t('nav.brand')}</span>
             </div>
           </div>
-          <button type="button" className="nav__drawer-close" onClick={() => setDrawerOpen(false)} aria-label={t('nav.closeMenu')}>
+          <button
+            type="button"
+            className="nav__drawer-close"
+            onClick={() => setDrawerOpen(false)}
+            aria-label={t('nav.closeMenu')}
+          >
             <span className="hamburger hamburger--active" aria-hidden>
               <span className="hamburger__line" />
               <span className="hamburger__line" />
@@ -247,6 +252,10 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
       </aside>
 
       <div className="app__content">{children}</div>
+
+      <footer className="app__footer">
+        <p className="app__copyright">{t('nav.copyright')}</p>
+      </footer>
     </div>
   );
 }

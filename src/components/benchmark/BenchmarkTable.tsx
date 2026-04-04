@@ -11,19 +11,26 @@ interface Props {
     avgLatency: string;
     totalTime: string;
   };
+  tooltips: {
+    policy: string;
+    hitRate: string;
+    missRate: string;
+    avgLatency: string;
+    totalTime: string;
+  };
 }
 
-export const BenchmarkTable = memo(function BenchmarkTable({ results, labels }: Props) {
+export const BenchmarkTable = memo(function BenchmarkTable({ results, labels, tooltips }: Props) {
   return (
     <div className="bench-table-wrap">
       <table className="bench-table">
         <thead>
           <tr>
-            <th>{labels.policy}</th>
-            <th>{labels.hitRate}</th>
-            <th>{labels.missRate}</th>
-            <th>{labels.avgLatency}</th>
-            <th>{labels.totalTime}</th>
+            <th className="bench-th--hint" title={tooltips.policy}>{labels.policy}</th>
+            <th className="bench-th--hint" title={tooltips.hitRate}>{labels.hitRate}</th>
+            <th className="bench-th--hint" title={tooltips.missRate}>{labels.missRate}</th>
+            <th className="bench-th--hint" title={tooltips.avgLatency}>{labels.avgLatency}</th>
+            <th className="bench-th--hint" title={tooltips.totalTime}>{labels.totalTime}</th>
           </tr>
         </thead>
         <tbody>
