@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 import type { CacheSnapshot } from '../types';
 import { useI18n } from '../i18n/I18nContext';
@@ -10,7 +11,7 @@ function nodeClass(key: number, h: CacheSnapshot['highlight']): string {
   return 'node';
 }
 
-export function FrequencyView({ snapshot }: { snapshot: CacheSnapshot }) {
+export const FrequencyView = memo(function FrequencyView({ snapshot }: { snapshot: CacheSnapshot }) {
   const { t } = useI18n();
   const { freqBuckets, highlight } = snapshot;
 
@@ -88,4 +89,4 @@ export function FrequencyView({ snapshot }: { snapshot: CacheSnapshot }) {
       )}
     </div>
   );
-}
+});

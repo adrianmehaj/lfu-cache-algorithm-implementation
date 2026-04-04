@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { LogEntry } from '../types';
 import { useI18n } from '../i18n/I18nContext';
@@ -22,19 +23,20 @@ function formatLog(e: LogEntry, t: (k: string, v?: Record<string, string | numbe
   }
 }
 
-export function EventLog({ logs }: { logs: LogEntry[] }) {
+export const EventLog = memo(function EventLog({ logs }: { logs: LogEntry[] }) {
   const { t } = useI18n();
   const miss = t('sidebar.miss');
+  const reversed = useMemo(() => [...logs].reverse(), [logs]);
 
   return (
     <div className="elog">
       <h3 className="card__title elog__title">{t('log.title')}</h3>
       <div className="elog__list">
-        {logs.length === 0 ? (
+        {reversed.length === 0 ? (
           <p className="elog__empty">{t('log.empty')}</p>
         ) : (
           <AnimatePresence initial={false}>
-            {[...logs].reverse().map((e) => (
+            {reversed.map((e) => (
               <motion.div
                 key={e.id}
                 className={`elog__item elog__item--${e.type}`}
@@ -51,4 +53,4 @@ export function EventLog({ logs }: { logs: LogEntry[] }) {
       </div>
     </div>
   );
-}
+});

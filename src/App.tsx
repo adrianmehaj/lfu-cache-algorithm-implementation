@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Layout } from './components/Layout';
 import { VisualizerPage } from './pages/VisualizerPage';
-import { BenchmarksPage } from './pages/BenchmarksPage';
-import { TheoryPage } from './pages/TheoryPage';
 import { I18nProvider } from './i18n/I18nContext';
+
+const BenchmarksPage = lazy(() => import('./pages/BenchmarksPage').then((m) => ({ default: m.BenchmarksPage })));
+const TheoryPage = lazy(() => import('./pages/TheoryPage').then((m) => ({ default: m.TheoryPage })));
 
 type Tab = 'visualizer' | 'benchmarks' | 'theory';
 
@@ -19,8 +20,10 @@ export default function App() {
     <I18nProvider>
       <Layout tab={tab} onTab={setTab} dark={dark} onTheme={() => setDark(!dark)}>
         {tab === 'visualizer' && <VisualizerPage />}
-        {tab === 'benchmarks' && <BenchmarksPage />}
-        {tab === 'theory'     && <TheoryPage />}
+        <Suspense fallback={null}>
+          {tab === 'benchmarks' && <BenchmarksPage />}
+          {tab === 'theory'     && <TheoryPage />}
+        </Suspense>
       </Layout>
     </I18nProvider>
   );

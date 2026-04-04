@@ -83,10 +83,14 @@ export class LFUCache {
 
   // ── get ──────────────────────────────────────────────────────────────────
 
+  has(key: number): boolean {
+    return this.keyMap.has(key);
+  }
+
   get(key: number): number {
     const node = this.keyMap.get(key);
     if (!node) return -1;
-    this.touch(node);      // rrit frekuencën, ruaj renditjen LRU
+    this.touch(node);
     return node.value;
   }
 

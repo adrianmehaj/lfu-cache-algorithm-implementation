@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { memo, useState, useMemo } from 'react';
 import type { CacheSnapshot } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 
-export function CacheTable({ snapshot }: { snapshot: CacheSnapshot }) {
+export const CacheTable = memo(function CacheTable({ snapshot }: { snapshot: CacheSnapshot }) {
   const { t } = useI18n();
   const [q, setQ] = useState('');
-  const rows = q ? snapshot.entries.filter((e) => String(e.key).includes(q) || String(e.value).includes(q)) : snapshot.entries;
+  const rows = useMemo(
+    () => q ? snapshot.entries.filter((e) => String(e.key).includes(q) || String(e.value).includes(q)) : snapshot.entries,
+    [q, snapshot.entries],
+  );
 
   return (
     <div className="card">
@@ -33,4 +36,4 @@ export function CacheTable({ snapshot }: { snapshot: CacheSnapshot }) {
       </div>
     </div>
   );
-}
+});
