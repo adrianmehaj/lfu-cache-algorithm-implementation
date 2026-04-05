@@ -7,7 +7,7 @@ export interface MessageDict {
 
 const en: MessageDict = {
   nav: {
-    brand: 'LFU cache visual simulator',
+    brand: 'LFU Cache Visual Simulator',
     visualizer: 'Visualizer',
     benchmarks: 'Benchmarks',
     theory: 'Theory',
@@ -17,7 +17,7 @@ const en: MessageDict = {
     menu: 'Navigation',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
-    copyright: '© 2026 Adrian Mehaj. All rights reserved.',
+    copyright: '© 2026 Adrian Mehaj — Bachelor Thesis Project • LFU Cache Visual Simulator',
   },
   sidebar: {
     capacity: 'Capacity',
@@ -41,7 +41,7 @@ const en: MessageDict = {
   viz: {
     freqBuckets: 'Buckets by access frequency',
     freqHint:
-      'Top = most recently used, bottom = least recently used within the same frequency. The last item is the LRU candidate for eviction at that frequency.',
+      'Top → most recently used, bottom → least recently used within the same frequency. The last item is the LRU candidate for eviction at that frequency.',
     noEntries: 'No items in the cache',
     frequency: 'Frequency',
     minFreqTag: '← lowest frequency (eviction tier)',
@@ -158,7 +158,7 @@ const sq: MessageDict = {
     menu: 'Navigimi',
     openMenu: 'Hap menunë',
     closeMenu: 'Mbyll menunë',
-    copyright: '© 2026 Adrian Mehaj. Të gjitha të drejtat e rezervuara.',
+    copyright: '© 2026 Adrian Mehaj — Projekt Diplome • Simulatori Vizual i LFU Cache',
   },
   sidebar: {
     capacity: 'Kapaciteti i memories',
@@ -182,7 +182,7 @@ const sq: MessageDict = {
   viz: {
     freqBuckets: 'Grupet sipas frekuencës së aksesit',
     freqHint:
-      'Lart = më i përdoruri së fundmi, poshtë = më i vjetri në rend brenda së njëjtës frekuencë. Elementi i fundit është kandidati LRU për dëbim në atë frekuencë.',
+      'Lart → më i përdoruri së fundmi, poshtë → më i vjetri në rend brenda së njëjtës frekuencë. Elementi i fundit është kandidati LRU për dëbim në atë frekuencë.',
     noEntries: 'Nuk ka asnjë element në memorie',
     frequency: 'Frekuenca',
     minFreqTag: '← frekuenca më e ulët (niveli i dëbimit)',

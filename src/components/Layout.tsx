@@ -290,6 +290,7 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
       <div className="app__content">{children}</div>
 
       <footer className="app__footer">
+        <div className="app__footer-line" />
         <p className="app__copyright">{t('nav.copyright')}</p>
       </footer>
     </div>
