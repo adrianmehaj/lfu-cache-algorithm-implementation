@@ -76,7 +76,8 @@ const en: MessageDict = {
     miss: 'GET({k}). Key {k} requested, but not found (Cache Miss) as it was previously evicted.',
     missEvict: 'GET({k}). Key {k} requested, but not found (Cache Miss) as it was evicted to make room for {new}.',
     get: 'GET({k}). Key {k} accessed. Its frequency increases to {f}.',
-    tieBreak: 'PUT({k}, {v}). Cache full. Key {old} is evicted (frequency {f}, but was accessed least recently — LRU tie-break).',
+    tieBreak:
+      'PUT({k}, {v}). Cache full. Key {old} is evicted (frequency {f}, but was accessed least recently — LRU tie-break).',
     done: 'Example completed successfully! ✅ You can now try your own actions.',
     customPut: 'Insert: Key {k} added with value {v}. Initial frequency = 1.',
     customUpdate: 'Update: Key {k} updated with value {v}. Frequency increased.',
@@ -103,13 +104,18 @@ const en: MessageDict = {
     missRate: 'Miss rate',
     avgLatency: 'Average latency',
     totalTime: 'Wall time',
-    ttPolicy: 'Replacement policy under test: LFU (least frequently used), LRU (least recently used), or FIFO (first-in first-out).',
-    ttHitRate: 'Hit rate (%): share of GET operations where the key was found in the cache — hits ÷ (hits + misses) × 100. Only reads are counted.',
-    ttMissRate: 'Miss rate (%): share of GET operations where the key was not in the cache — misses ÷ (hits + misses) × 100.',
-    ttAvgLatency: 'Average latency (µs per operation): total wall time for all GETs and PUTs divided by operation count, measured with performance.now().',
+    ttPolicy:
+      'Replacement policy under test: LFU (least frequently used), LRU (least recently used), or FIFO (first-in first-out).',
+    ttHitRate:
+      'Hit rate (%): share of GET operations where the key was found in the cache — hits ÷ (hits + misses) × 100. Only reads are counted.',
+    ttMissRate:
+      'Miss rate (%): share of GET operations where the key was not in the cache — misses ÷ (hits + misses) × 100.',
+    ttAvgLatency:
+      'Average latency (µs per operation): total wall time for all GETs and PUTs divided by operation count, measured with performance.now().',
     ttTotalTime: 'Total wall time (ms) to execute the full workload once for this policy in the browser.',
     ttHitChart: 'Bar chart: hit rate (%) and miss rate (%) per policy — same metric definitions as the table.',
-    ttLatChart: 'Bar chart: average latency in microseconds (µs) per operation — same definition as the “Average latency” column.',
+    ttLatChart:
+      'Bar chart: average latency in microseconds (µs) per operation — same definition as the “Average latency” column.',
     ttSummaryBestHit: 'Policy with the highest hit rate (%) on this run.',
     ttSummaryFastest: 'Policy with the lowest average latency (µs per operation) on this run.',
     hitChart: 'Hit rate by policy',
@@ -119,7 +125,8 @@ const en: MessageDict = {
     wlSequential: 'Sequential scan',
     wlTemporal: 'Temporal locality',
     exportExcel: 'Export spreadsheet (.xlsx)',
-    exportExcelHint: 'Formatted workbook with the results table (two decimal places, header row, alternating row shading).',
+    exportExcelHint:
+      'Formatted workbook with the results table (two decimal places, header row, alternating row shading).',
     sectionSpreadsheet: 'Spreadsheet export',
     exportPng: 'Export PNG',
     exportSvg: 'Export SVG',
@@ -205,11 +212,14 @@ const sq: MessageDict = {
     put: 'PUT({k}, {v}). Shtohet çelësi {k}. Frekuenca fillestare është 1 sepse sapo u fut.',
     putFull: 'PUT({k}, {v}). Shtohet çelësi {k}. Tani memoria është plot (kapaciteti 2).',
     getFreq: 'GET({k}). Aksesohet çelësi {k}. Frekuenca e tij rritet nga {f1} në {f2} (shihni lëvizjen te Buckets).',
-    evict: 'PUT({k}, {v}). Memoria është plot. Dëbohet çelësi {old} (frekuenca më e ulët = {f}) për të bërë vend për {k}.',
+    evict:
+      'PUT({k}, {v}). Memoria është plot. Dëbohet çelësi {old} (frekuenca më e ulët = {f}) për të bërë vend për {k}.',
     miss: 'GET({k}). Kërkohet çelësi {k}, por nuk gjendet (Cache Miss) sepse u dëbua në hapin e kaluar.',
-    missEvict: 'GET({k}). Kërkohet çelësi {k}, por nuk gjendet (Cache Miss) sepse u dëbua për t\'i lënë vend {new}-shit.',
+    missEvict:
+      "GET({k}). Kërkohet çelësi {k}, por nuk gjendet (Cache Miss) sepse u dëbua për t'i lënë vend {new}-shit.",
     get: 'GET({k}). Aksesohet çelësi {k}. Frekuenca e tij rritet në {f}.',
-    tieBreak: 'PUT({k}, {v}). Memoria plot. Dëbohet çelësi {old} (frekuenca {f}, por u aksesu më herët se të tjerët — LRU tie-break).',
+    tieBreak:
+      'PUT({k}, {v}). Memoria plot. Dëbohet çelësi {old} (frekuenca {f}, por u aksesu më herët se të tjerët — LRU tie-break).',
     done: 'Shembulli përfundoi me sukses! ✅ Tani mund të provoni veprimet tuaja.',
     customPut: 'Shtim: U shtua çelësi {k} me vlerë {v}. Frekuenca fillestare = 1.',
     customUpdate: 'Përditësim: Çelësi {k} u përditësua me vlerën {v}. Frekuenca u rrit.',
@@ -222,8 +232,7 @@ const sq: MessageDict = {
   },
   bench: {
     title: 'Laboratori i krahasimit të performancës',
-    subtitle:
-      'Krahaso politikat e zëvendësimit LFU, LRU dhe FIFO në ngarkesa të simuluara.',
+    subtitle: 'Krahaso politikat e zëvendësimit LFU, LRU dhe FIFO në ngarkesa të simuluara.',
     capacity: 'Kapaciteti i memories',
     totalOps: 'Numri i veprimeve',
     readRatio: 'Përzierja lexim / shkrim (0–1)',
@@ -238,12 +247,16 @@ const sq: MessageDict = {
     avgLatency: 'Vonesa mesatare',
     totalTime: 'Koha e përgjithshme',
     ttPolicy: 'Politika e zëvendësimit: LFU (më pak i përdoruri), LRU (më i vjetri në kohë), ose FIFO (i pari që hyn).',
-    ttHitRate: 'Hit rate (%): pjesëmëria e operacioneve GET ku çelësi gjendej në cache — goditje ÷ (goditje + mungesa) × 100. Numërohen vetëm leximet.',
-    ttMissRate: 'Miss rate (%): pjesëmëria e GET-ave ku çelësi nuk ishte në cache — mungesa ÷ (goditje + mungesa) × 100.',
-    ttAvgLatency: 'Vonesa mesatare (µs për operacion): koha totale e matur me performance.now() për të gjitha GET/PUT, e ndarë me numrin e operacioneve.',
+    ttHitRate:
+      'Hit rate (%): pjesëmëria e operacioneve GET ku çelësi gjendej në cache — goditje ÷ (goditje + mungesa) × 100. Numërohen vetëm leximet.',
+    ttMissRate:
+      'Miss rate (%): pjesëmëria e GET-ave ku çelësi nuk ishte në cache — mungesa ÷ (goditje + mungesa) × 100.',
+    ttAvgLatency:
+      'Vonesa mesatare (µs për operacion): koha totale e matur me performance.now() për të gjitha GET/PUT, e ndarë me numrin e operacioneve.',
     ttTotalTime: 'Koha e plotë e ekzekutimit (ms) e të gjithë workload-it një herë për këtë politika, në shfletues.',
     ttHitChart: 'Grafik shtyllash: hit rate (%) dhe miss rate (%) sipas politikës — i njëjti kuptim si në tabelë.',
-    ttLatChart: 'Grafik shtyllash: vonesa mesatare në mikrosekonda (µs) për operacion — i njëjti kuptim si kolona “Vonesa mesatare”.',
+    ttLatChart:
+      'Grafik shtyllash: vonesa mesatare në mikrosekonda (µs) për operacion — i njëjti kuptim si kolona “Vonesa mesatare”.',
     ttSummaryBestHit: 'Politika me hit rate më të lartë (%) në këtë ekzekutim.',
     ttSummaryFastest: 'Politika me vonesë mesatare më të ulët (µs për operacion) në këtë ekzekutim.',
     hitChart: 'Goditjet sipas politikës',
@@ -253,7 +266,8 @@ const sq: MessageDict = {
     wlSequential: 'Radhitëse (sekuenciale)',
     wlTemporal: 'Lokalitet kohor',
     exportExcel: 'Eksporto spreadsheet (.xlsx)',
-    exportExcelHint: 'Skedar Excel i formatuar me tabelën e rezultateve (dy shifra pas presjes, rresht header, rreshta të ndërsyerë).',
+    exportExcelHint:
+      'Skedar Excel i formatuar me tabelën e rezultateve (dy shifra pas presjes, rresht header, rreshta të ndërsyerë).',
     sectionSpreadsheet: 'Eksporti i spreadsheet-it',
     exportPng: 'Eksporto PNG',
     exportSvg: 'Eksporto SVG',

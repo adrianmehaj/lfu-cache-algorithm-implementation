@@ -4,10 +4,10 @@ import type { CacheSnapshot } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 
 function nodeClass(key: number, h: CacheSnapshot['highlight']): string {
-  if (key === h.evictedKey)  return 'node node--evicted';
+  if (key === h.evictedKey) return 'node node--evicted';
   if (key === h.insertedKey) return 'node node--inserted';
   if (key === h.accessedKey) return 'node node--accessed';
-  if (key === h.updatedKey)  return 'node node--updated';
+  if (key === h.updatedKey) return 'node node--updated';
   return 'node';
 }
 
@@ -69,9 +69,7 @@ export const FrequencyView = memo(function FrequencyView({ snapshot }: { snapsho
                           <span className="node__val">
                             <span className="node__lbl">{t('viz.value')}:</span> {n.value}
                           </span>
-                          {idx === b.nodes.length - 1 && b.isMinFreq && (
-                            <span className="node__lru-badge">LRU</span>
-                          )}
+                          {idx === b.nodes.length - 1 && b.isMinFreq && <span className="node__lru-badge">LRU</span>}
                         </motion.div>
                       ))}
                     </AnimatePresence>

@@ -1,18 +1,16 @@
-
 export class LFUNode {
-  key:   number;
+  key: number;
   value: number;
-  freq:  number;
-  prev:  LFUNode | null = null;
-  next:  LFUNode | null = null;
+  freq: number;
+  prev: LFUNode | null = null;
+  next: LFUNode | null = null;
 
   constructor(key: number, value: number, freq = 1) {
-    this.key   = key;
+    this.key = key;
     this.value = value;
-    this.freq  = freq;
+    this.freq = freq;
   }
 }
-
 
 // ─── 2. FreqBucket (lista e dyfishtë e lidhur) ───────────────────────────────
 
@@ -22,18 +20,18 @@ export class FreqBucket {
 
   constructor() {
     // Sentinel nodes — nuk mbajnë të dhëna reale, thjeshtojnë operacionet
-    this.head      = new LFUNode(-1, -1, -1);
-    this.tail      = new LFUNode(-1, -1, -1);
+    this.head = new LFUNode(-1, -1, -1);
+    this.tail = new LFUNode(-1, -1, -1);
     this.head.next = this.tail;
     this.tail.prev = this.head;
   }
 
   /** Shto nyjen menjëherë pas head (pozicioni MRU). O(1). */
   addFirst(node: LFUNode): void {
-    node.prev            = this.head;
-    node.next            = this.head.next!;
+    node.prev = this.head;
+    node.next = this.head.next!;
     this.head.next!.prev = node;
-    this.head.next       = node;
+    this.head.next = node;
   }
 
   /** Hiq nyjen nga lista. O(1). */
@@ -67,14 +65,13 @@ export class FreqBucket {
   }
 }
 
-
 // ─── 3. LFUCache ─────────────────────────────────────────────────────────────
 
 export class LFUCache {
   capacity: number;
-  size     = 0;
-  minFreq  = 0;
-  private keyMap  = new Map<number, LFUNode>();
+  size = 0;
+  minFreq = 0;
+  private keyMap = new Map<number, LFUNode>();
   private freqMap = new Map<number, FreqBucket>();
 
   constructor(capacity: number) {
@@ -110,9 +107,9 @@ export class LFUCache {
     // Memoria plot — dëbo LRU nga lista e minFreq
     let evictedInfo: { key: number; value: number } | undefined;
     if (this.size === this.capacity) {
-      const list    = this.freqMap.get(this.minFreq)!;
+      const list = this.freqMap.get(this.minFreq)!;
       const evicted = list.removeLast()!;
-      evictedInfo   = { key: evicted.key, value: evicted.value };
+      evictedInfo = { key: evicted.key, value: evicted.value };
       this.keyMap.delete(evicted.key);
       this.size--;
     }
@@ -130,7 +127,7 @@ export class LFUCache {
 
   private touch(node: LFUNode): void {
     const oldFreq = node.freq;
-    const list    = this.freqMap.get(oldFreq)!;
+    const list = this.freqMap.get(oldFreq)!;
     list.remove(node);
 
     if (list.isEmpty()) {
@@ -155,7 +152,7 @@ export class LFUCache {
 
   getState() {
     const freqBuckets: Array<{
-      freq:  number;
+      freq: number;
       nodes: Array<{ key: number; value: number; freq: number }>;
     }> = [];
 
@@ -166,9 +163,9 @@ export class LFUCache {
     }
 
     return {
-      size:        this.size,
-      capacity:    this.capacity,
-      minFreq:     this.minFreq,
+      size: this.size,
+      capacity: this.capacity,
+      minFreq: this.minFreq,
       freqBuckets,
     };
   }
@@ -177,7 +174,7 @@ export class LFUCache {
 
   reset(newCapacity?: number): void {
     if (newCapacity != null) this.capacity = newCapacity;
-    this.size    = 0;
+    this.size = 0;
     this.minFreq = 0;
     this.keyMap.clear();
     this.freqMap.clear();

@@ -3,9 +3,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useBenchmark } from '../hooks/useBenchmark';
 import type { WorkloadType } from '../types';
 import { useI18n } from '../i18n/I18nContext';
-import { BenchmarkCharts, BenchmarkTable, BenchmarkSummary, TableExportButton, ChartExportButtons } from '../components/benchmark';
+import {
+  BenchmarkCharts,
+  BenchmarkTable,
+  BenchmarkSummary,
+  TableExportButton,
+  ChartExportButtons,
+} from '../components/benchmark';
 
-const opsOpts = [{ v: 1000, l: '1K' }, { v: 5000, l: '5K' }, { v: 10_000, l: '10K' }, { v: 50_000, l: '50K' }, { v: 100_000, l: '100K' }];
+const opsOpts = [
+  { v: 1000, l: '1K' },
+  { v: 5000, l: '5K' },
+  { v: 10_000, l: '10K' },
+  { v: 50_000, l: '50K' },
+  { v: 100_000, l: '100K' },
+];
 const wlOpts: { v: WorkloadType; tk: string }[] = [
   { v: 'uniform', tk: 'bench.wlUniform' },
   { v: 'zipf', tk: 'bench.wlZipf' },
@@ -99,7 +111,14 @@ export function BenchmarksPage() {
           <div className="bench-cfg">
             <div className="field">
               <label>{t('bench.capacity')}</label>
-              <input type="number" min={1} max={512} value={config.capacity} onChange={(e) => set({ capacity: Math.max(1, +e.target.value || 1) })} disabled={running} />
+              <input
+                type="number"
+                min={1}
+                max={512}
+                value={config.capacity}
+                onChange={(e) => set({ capacity: Math.max(1, +e.target.value || 1) })}
+                disabled={running}
+              />
             </div>
             <div className="field">
               <label>{t('bench.totalOps')}</label>
@@ -113,11 +132,23 @@ export function BenchmarksPage() {
             </div>
             <div className="field">
               <label>{t('bench.readRatio')}</label>
-              <input type="number" min={0} max={1} step={0.1} value={config.readRatio} onChange={(e) => set({ readRatio: Math.min(1, Math.max(0, +e.target.value || 0)) })} disabled={running} />
+              <input
+                type="number"
+                min={0}
+                max={1}
+                step={0.1}
+                value={config.readRatio}
+                onChange={(e) => set({ readRatio: Math.min(1, Math.max(0, +e.target.value || 0)) })}
+                disabled={running}
+              />
             </div>
             <div className="field">
               <label>{t('bench.workload')}</label>
-              <select value={config.workload} onChange={(e) => set({ workload: e.target.value as WorkloadType })} disabled={running}>
+              <select
+                value={config.workload}
+                onChange={(e) => set({ workload: e.target.value as WorkloadType })}
+                disabled={running}
+              >
                 {wlOpts.map((o) => (
                   <option key={o.v} value={o.v}>
                     {t(o.tk)}
@@ -155,7 +186,12 @@ export function BenchmarksPage() {
         <>
           <BenchmarkSummary results={results} labels={summaryLabels} />
 
-          <motion.div className="card page__card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.35 }}>
+          <motion.div
+            className="card page__card"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.35 }}
+          >
             <TableExportButton
               results={results}
               sectionTitle={t('bench.sectionSpreadsheet')}
@@ -164,11 +200,7 @@ export function BenchmarksPage() {
               headers={tableHeaders}
               sheetName={t('bench.excelSheet')}
             />
-            <BenchmarkTable
-              results={results}
-              labels={tableHeaders}
-              tooltips={tableTooltips}
-            />
+            <BenchmarkTable results={results} labels={tableHeaders} tooltips={tableTooltips} />
           </motion.div>
 
           <div className="bench-charts-outer card page__card">

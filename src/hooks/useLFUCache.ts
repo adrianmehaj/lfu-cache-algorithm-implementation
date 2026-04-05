@@ -26,11 +26,24 @@ export function useLFUCache(initCap = 2) {
     t,
   });
 
+  const {
+    demoActive,
+    stopDemo,
+    loadDemo: startLoadDemo,
+    runRecordedDemo: startRecordedDemo,
+    interruptActiveDemoForMobileNav,
+    pauseDemo,
+    resumeDemo,
+    demoMessage,
+    demoPaused,
+    demoFocus,
+  } = demo;
+
   /* ── Cache operations ── */
 
   const put = useCallback(
     (key: number, value: number) => {
-      if (demo.demoActive) demo.stopDemo();
+      if (demoActive) stopDemo();
       const c = cacheRef.current;
       const isUpdate = c.has(key);
       const { evicted } = c.put(key, value);
@@ -42,7 +55,7 @@ export function useLFUCache(initCap = 2) {
           k: key,
           v: value,
           cap: capacity,
-          type: isUpdate ? 'update' as const : evicted ? 'evict' as const : 'put' as const,
+          type: isUpdate ? ('update' as const) : evicted ? ('evict' as const) : ('put' as const),
           old: evicted?.key,
           oldVal: evicted?.value,
         },
@@ -63,38 +76,41 @@ export function useLFUCache(initCap = 2) {
       setLogs((p) => [...p, ...newLogs]);
       setStats((s) => ({ ...s, puts: s.puts + 1, evictions: s.evictions + (evicted ? 1 : 0) }));
     },
-    [capacity, demo.demoActive, demo.stopDemo],
+    [capacity, demoActive, stopDemo],
   );
 
   const get = useCallback(
     (key: number) => {
-      if (demo.demoActive) demo.stopDemo();
+      if (demoActive) stopDemo();
       const result = cacheRef.current.get(key);
       const hit = result !== -1;
 
-      setRecordedActions((p) => [...p, { op: 'get' as const, k: key, v: result, cap: capacity, type: hit ? 'hit' as const : 'miss' as const }]);
+      setRecordedActions((p) => [
+        ...p,
+        { op: 'get' as const, k: key, v: result, cap: capacity, type: hit ? ('hit' as const) : ('miss' as const) },
+      ]);
 
       setSnap(snap(cacheRef.current, { ...emptyHighlight(), accessedKey: hit ? key : null }));
       setLogs((p) => [...p, { id: uid(), type: 'get', key, result, hit }]);
       setStats((s) => ({ ...s, gets: s.gets + 1, hits: s.hits + (hit ? 1 : 0), misses: s.misses + (hit ? 0 : 1) }));
       return result;
     },
-    [capacity, demo.demoActive, demo.stopDemo],
+    [capacity, demoActive, stopDemo],
   );
 
   const reset = useCallback(() => {
-    demo.stopDemo();
+    stopDemo();
     cacheRef.current.reset(capacity);
     setSnap(snap(cacheRef.current, emptyHighlight()));
     setLogs([]);
     setStats(emptyStats);
     setRecordedActions([]);
-  }, [capacity, demo.stopDemo]);
+  }, [capacity, stopDemo]);
 
   const setCapacity = useCallback(
     (cap: number) => {
       if (cap < 0) return;
-      demo.stopDemo();
+      stopDemo();
       setCapState(cap);
       cacheRef.current = new LFUCache(cap);
       setSnap(snap(cacheRef.current, emptyHighlight()));
@@ -102,7 +118,7 @@ export function useLFUCache(initCap = 2) {
       setStats(emptyStats);
       setRecordedActions([]);
     },
-    [demo.stopDemo],
+    [stopDemo],
   );
 
   const loadDemo = useCallback(() => {
@@ -110,8 +126,8 @@ export function useLFUCache(initCap = 2) {
     setCapState(2);
     setLogs([]);
     setStats(emptyStats);
-    demo.loadDemo();
-  }, [demo.loadDemo]);
+    startLoadDemo();
+  }, [startLoadDemo]);
 
   const runRecordedDemo = useCallback(() => {
     if (recordedActions.length === 0) return;
@@ -120,8 +136,8 @@ export function useLFUCache(initCap = 2) {
     setCapState(startCap);
     setLogs([]);
     setStats(emptyStats);
-    demo.runRecordedDemo(recordedActions);
-  }, [recordedActions, demo.runRecordedDemo]);
+    startRecordedDemo(recordedActions);
+  }, [recordedActions, startRecordedDemo]);
 
   return {
     put,
@@ -130,18 +146,18 @@ export function useLFUCache(initCap = 2) {
     setCapacity,
     loadDemo,
     runRecordedDemo,
-    stopDemo: demo.stopDemo,
-    interruptActiveDemoForMobileNav: demo.interruptActiveDemoForMobileNav,
-    pauseDemo: demo.pauseDemo,
-    resumeDemo: demo.resumeDemo,
+    stopDemo,
+    interruptActiveDemoForMobileNav,
+    pauseDemo,
+    resumeDemo,
     capacity,
     snapshot,
     logs,
     stats,
-    demoMessage: demo.demoMessage,
-    demoActive: demo.demoActive,
-    demoPaused: demo.demoPaused,
-    demoFocus: demo.demoFocus,
+    demoMessage,
+    demoActive,
+    demoPaused,
+    demoFocus,
     hasRecordedActions: recordedActions.length > 0,
   };
 }

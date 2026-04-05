@@ -1,14 +1,5 @@
 import { forwardRef, memo, useMemo } from 'react';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { motion } from 'framer-motion';
 import type { BenchmarkResult } from '../../types';
 
@@ -32,10 +23,7 @@ export const BenchmarkCharts = memo(
       () => results.map((r) => ({ name: r.policy, hit: r.hitRate, miss: r.missRate })),
       [results],
     );
-    const latData = useMemo(
-      () => results.map((r) => ({ name: r.policy, latency: r.avgLatencyUs })),
-      [results],
-    );
+    const latData = useMemo(() => results.map((r) => ({ name: r.policy, latency: r.avgLatencyUs })), [results]);
 
     const axis = { stroke: 'var(--dim)', fontSize: 11 };
     const grid = { stroke: 'var(--border-sub)', strokeDasharray: '3 3' };
@@ -66,17 +54,16 @@ export const BenchmarkCharts = memo(
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       >
         <div className="bench-chart-panel">
-          <h4 className="card__title bench-chart-panel__title bench-chart-panel__title--hint" title={hitTitleHint}>{hitTitle}</h4>
+          <h4 className="card__title bench-chart-panel__title bench-chart-panel__title--hint" title={hitTitleHint}>
+            {hitTitle}
+          </h4>
           <div className="bench-chart-panel__inner">
             <ResponsiveContainer width="100%" height={280} minHeight={220}>
               <BarChart data={hitData} margin={{ top: 8, right: 12, left: 4, bottom: 4 }} barCategoryGap="18%">
                 <CartesianGrid {...grid} vertical={false} />
                 <XAxis dataKey="name" tick={axis} tickLine={false} axisLine={{ stroke: 'var(--border)' }} />
                 <YAxis tick={axis} tickLine={false} axisLine={false} unit=" %" domain={[0, 'auto']} />
-                <Tooltip
-                  {...tooltipBase}
-                  formatter={(v, name) => [`${Number(v ?? 0).toFixed(2)}%`, String(name)]}
-                />
+                <Tooltip {...tooltipBase} formatter={(v, name) => [`${Number(v ?? 0).toFixed(2)}%`, String(name)]} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
                 <Bar
                   dataKey="hit"
@@ -102,7 +89,9 @@ export const BenchmarkCharts = memo(
         </div>
 
         <div className="bench-chart-panel">
-          <h4 className="card__title bench-chart-panel__title bench-chart-panel__title--hint" title={latTitleHint}>{latTitle}</h4>
+          <h4 className="card__title bench-chart-panel__title bench-chart-panel__title--hint" title={latTitleHint}>
+            {latTitle}
+          </h4>
           <div className="bench-chart-panel__inner">
             <ResponsiveContainer width="100%" height={280} minHeight={220}>
               <BarChart data={latData} margin={{ top: 8, right: 12, left: 4, bottom: 4 }} barCategoryGap="22%">

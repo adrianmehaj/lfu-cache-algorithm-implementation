@@ -1,8 +1,16 @@
 /* ── Visualization Snapshots ── */
 
-export interface NodeEntry { key: number; value: number; freq: number }
+export interface NodeEntry {
+  key: number;
+  value: number;
+  freq: number;
+}
 
-export interface FreqBucket { freq: number; nodes: NodeEntry[]; isMinFreq: boolean }
+export interface FreqBucket {
+  freq: number;
+  nodes: NodeEntry[];
+  isMinFreq: boolean;
+}
 
 export interface CacheSnapshot {
   capacity: number;
@@ -24,7 +32,11 @@ export interface Highlight {
 }
 
 export const emptyHighlight = (): Highlight => ({
-  insertedKey: null, accessedKey: null, updatedKey: null, evictedKey: null, evictedValue: null,
+  insertedKey: null,
+  accessedKey: null,
+  updatedKey: null,
+  evictedKey: null,
+  evictedValue: null,
 });
 
 /* ── Operation Log (structured for i18n) ── */
@@ -37,11 +49,19 @@ export type LogEntry =
 /* ── Stats ── */
 
 export interface Stats {
-  puts: number; gets: number; evictions: number; hits: number; misses: number;
+  puts: number;
+  gets: number;
+  evictions: number;
+  hits: number;
+  misses: number;
 }
 
 export const emptyStats = (): Stats => ({
-  puts: 0, gets: 0, evictions: 0, hits: 0, misses: 0,
+  puts: 0,
+  gets: 0,
+  evictions: 0,
+  hits: 0,
+  misses: 0,
 });
 
 /* ── Benchmark ── */
@@ -49,9 +69,16 @@ export const emptyStats = (): Stats => ({
 export type WorkloadType = 'uniform' | 'zipf' | 'sequential' | 'temporal';
 
 export interface BenchmarkConfig {
-  capacity: number; totalOps: number; readRatio: number; workload: WorkloadType;
+  capacity: number;
+  totalOps: number;
+  readRatio: number;
+  workload: WorkloadType;
 }
 
 export interface BenchmarkResult {
-  policy: string; hitRate: number; missRate: number; avgLatencyUs: number; totalTimeMs: number;
+  policy: string;
+  hitRate: number;
+  missRate: number;
+  avgLatencyUs: number;
+  totalTimeMs: number;
 }

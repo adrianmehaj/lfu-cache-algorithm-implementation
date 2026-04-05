@@ -64,7 +64,7 @@ export function VisualizerPage() {
     () => () => {
       if (pendingDemoTapRef.current) clearTimeout(pendingDemoTapRef.current);
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -73,8 +73,7 @@ export function VisualizerPage() {
     return () => window.removeEventListener(LFU_NAV_DRAWER_OPEN_EVENT, onDrawerOpen);
   }, [interruptActiveDemoForMobileNav]);
 
-  const isDemoCountdown =
-    demoActive && demoMessage != null && /^[321]$/.test(String(demoMessage).trim());
+  const isDemoCountdown = demoActive && demoMessage != null && /^[321]$/.test(String(demoMessage).trim());
 
   const onDemoScreenPointerUp = useCallback(
     (e: React.MouseEvent) => {
@@ -101,7 +100,7 @@ export function VisualizerPage() {
         else pauseDemo();
       }, DEMO_TAP_GAP_MS);
     },
-    [pauseDemo, resumeDemo, stopDemo]
+    [pauseDemo, resumeDemo, stopDemo],
   );
 
   return (
@@ -116,9 +115,7 @@ export function VisualizerPage() {
       {demoMessage && !isDemoCountdown && (
         <div ref={modalRef} className={`demo-overlay ${demoFocus ? `demo-overlay--focus-${demoFocus}` : ''}`}>
           <div className="demo-modal">
-            <div className="demo-modal__content">
-              {demoMessage}
-            </div>
+            <div className="demo-modal__content">{demoMessage}</div>
           </div>
         </div>
       )}
@@ -144,31 +141,46 @@ export function VisualizerPage() {
       <div className={`viz-rail viz-rail--left ${demoActive ? 'demo-dim' : ''}`}>
         <div className="viz-rail-stack">
           <Sidebar
-            capacity={capacity} size={snapshot.size} minFreq={snapshot.minFreq}
-            onCapacity={setCapacity} onPut={put} onGet={get}
-            onReset={reset} onLoadDemo={loadDemo}
+            capacity={capacity}
+            size={snapshot.size}
+            minFreq={snapshot.minFreq}
+            onCapacity={setCapacity}
+            onPut={put}
+            onGet={get}
+            onReset={reset}
+            onLoadDemo={loadDemo}
             onRunRecorded={runRecordedDemo}
             hasRecorded={hasRecordedActions}
           />
         </div>
       </div>
-      
-      <main ref={vizRef} className={`viz-main ${demoActive && demoFocus !== 'viz' ? 'demo-dim' : ''} ${demoFocus === 'viz' ? 'demo-focus-ring' : ''}`}>
+
+      <main
+        ref={vizRef}
+        className={`viz-main ${demoActive && demoFocus !== 'viz' ? 'demo-dim' : ''} ${demoFocus === 'viz' ? 'demo-focus-ring' : ''}`}
+      >
         <FrequencyView snapshot={snapshot} />
         <CacheTable snapshot={snapshot} />
         {snapshot.highlight.evictedKey != null && (
           <div className="evict-banner" role="status">
             <div className="evict-banner__title">
-              {t('viz.evictedTitle')}: <strong>{snapshot.highlight.evictedKey}</strong> (Vlera: {snapshot.highlight.evictedValue})
+              {t('viz.evictedTitle')}: <strong>{snapshot.highlight.evictedKey}</strong> (Vlera:{' '}
+              {snapshot.highlight.evictedValue})
             </div>
             <p className="evict-banner__hint">
-              {t('viz.evictedHint', { key: snapshot.highlight.evictedKey, value: snapshot.highlight.evictedValue ?? '?' })}
+              {t('viz.evictedHint', {
+                key: snapshot.highlight.evictedKey,
+                value: snapshot.highlight.evictedValue ?? '?',
+              })}
             </p>
           </div>
         )}
       </main>
 
-      <div ref={logsRef} className={`viz-rail viz-rail--right ${demoActive && demoFocus !== 'logs' ? 'demo-dim' : ''} ${demoFocus === 'logs' ? 'demo-focus-ring' : ''}`}>
+      <div
+        ref={logsRef}
+        className={`viz-rail viz-rail--right ${demoActive && demoFocus !== 'logs' ? 'demo-dim' : ''} ${demoFocus === 'logs' ? 'demo-focus-ring' : ''}`}
+      >
         <div className="viz-rail-stack">
           <div className="card viz-rail-card">
             <EventLog logs={logs} />

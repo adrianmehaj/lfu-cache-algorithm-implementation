@@ -26,11 +26,21 @@ export const BenchmarkTable = memo(function BenchmarkTable({ results, labels, to
       <table className="bench-table">
         <thead>
           <tr>
-            <th className="bench-th--hint" title={tooltips.policy}>{labels.policy}</th>
-            <th className="bench-th--hint" title={tooltips.hitRate}>{labels.hitRate}</th>
-            <th className="bench-th--hint" title={tooltips.missRate}>{labels.missRate}</th>
-            <th className="bench-th--hint" title={tooltips.avgLatency}>{labels.avgLatency}</th>
-            <th className="bench-th--hint" title={tooltips.totalTime}>{labels.totalTime}</th>
+            <th className="bench-th--hint" title={tooltips.policy}>
+              {labels.policy}
+            </th>
+            <th className="bench-th--hint" title={tooltips.hitRate}>
+              {labels.hitRate}
+            </th>
+            <th className="bench-th--hint" title={tooltips.missRate}>
+              {labels.missRate}
+            </th>
+            <th className="bench-th--hint" title={tooltips.avgLatency}>
+              {labels.avgLatency}
+            </th>
+            <th className="bench-th--hint" title={tooltips.totalTime}>
+              {labels.totalTime}
+            </th>
           </tr>
         </thead>
         <tbody>

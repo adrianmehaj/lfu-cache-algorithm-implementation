@@ -22,7 +22,7 @@ export default function App() {
         {tab === 'visualizer' && <VisualizerPage />}
         <Suspense fallback={null}>
           {tab === 'benchmarks' && <BenchmarksPage />}
-          {tab === 'theory'     && <TheoryPage />}
+          {tab === 'theory' && <TheoryPage />}
         </Suspense>
       </Layout>
     </I18nProvider>

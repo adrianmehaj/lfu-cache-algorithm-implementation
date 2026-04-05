@@ -31,7 +31,9 @@ export const BenchmarkSummary = memo(function BenchmarkSummary({ results, labels
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.05 }}
       >
-        <span className="bench-summary__label bench-summary__label--hint" title={labels.ttBestHit}>{labels.bestHit}</span>
+        <span className="bench-summary__label bench-summary__label--hint" title={labels.ttBestHit}>
+          {labels.bestHit}
+        </span>
         <span className="bench-summary__value bench-summary__value--hit">{best.maxHit.policy}</span>
         <span className="bench-summary__meta">{best.maxHit.hitRate.toFixed(2)}%</span>
       </motion.div>
@@ -41,7 +43,9 @@ export const BenchmarkSummary = memo(function BenchmarkSummary({ results, labels
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.12 }}
       >
-        <span className="bench-summary__label bench-summary__label--hint" title={labels.ttFastest}>{labels.fastest}</span>
+        <span className="bench-summary__label bench-summary__label--hint" title={labels.ttFastest}>
+          {labels.fastest}
+        </span>
         <span className="bench-summary__value bench-summary__value--lat">{best.minLat.policy}</span>
         <span className="bench-summary__meta">{best.minLat.avgLatencyUs.toFixed(2)} µs / op</span>
       </motion.div>

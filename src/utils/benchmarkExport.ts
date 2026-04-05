@@ -50,7 +50,12 @@ export function downloadBlob(filename: string, blob: Blob): void {
 }
 
 /** Vector export: hit rate and latency bar charts in one SVG. */
-export function buildBenchmarkSvg(results: BenchmarkResult[], title: string, labelHit: string, labelLat: string): string {
+export function buildBenchmarkSvg(
+  results: BenchmarkResult[],
+  title: string,
+  labelHit: string,
+  labelLat: string,
+): string {
   const w = 800;
   const h = 380;
   const pad = 40;
@@ -63,7 +68,13 @@ export function buildBenchmarkSvg(results: BenchmarkResult[], title: string, lab
   const barW = Math.min(slot - 12, 72);
   const colors = ['#6366f1', '#10b981', '#f59e0b'];
 
-  const row = (baseY: number, label: string, getVal: (r: BenchmarkResult) => number, max: number, fmt: (v: number) => string) => {
+  const row = (
+    baseY: number,
+    label: string,
+    getVal: (r: BenchmarkResult) => number,
+    max: number,
+    fmt: (v: number) => string,
+  ) => {
     const parts: string[] = [
       `<text x="${pad}" y="${baseY - 8}" fill="#94a3b8" font-size="12" font-family="system-ui,sans-serif">${escapeXml(label)}</text>`,
     ];
@@ -82,8 +93,20 @@ export function buildBenchmarkSvg(results: BenchmarkResult[], title: string, lab
     return parts.join('');
   };
 
-  const hitSvg = row(72, labelHit, (r) => r.hitRate, maxHit, (v) => `${v.toFixed(1)}%`);
-  const latSvg = row(220, labelLat, (r) => r.avgLatencyUs, maxLat, (v) => `${v.toFixed(2)} µs`);
+  const hitSvg = row(
+    72,
+    labelHit,
+    (r) => r.hitRate,
+    maxHit,
+    (v) => `${v.toFixed(1)}%`,
+  );
+  const latSvg = row(
+    220,
+    labelLat,
+    (r) => r.avgLatencyUs,
+    maxLat,
+    (v) => `${v.toFixed(2)} µs`,
+  );
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
@@ -109,14 +132,11 @@ export async function exportChartsPng(element: HTMLElement | null, filename: str
     logging: false,
   });
   await new Promise<void>((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => {
-        if (blob) {
-          downloadBlob(filename, blob);
-          resolve();
-        } else reject(new Error('PNG blob failed'));
-      },
-      'image/png',
-    );
+    canvas.toBlob((blob) => {
+      if (blob) {
+        downloadBlob(filename, blob);
+        resolve();
+      } else reject(new Error('PNG blob failed'));
+    }, 'image/png');
   });
 }

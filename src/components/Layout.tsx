@@ -20,7 +20,15 @@ const TAB_KEYS: Record<Tab, string> = {
 };
 
 function DrawerTabIcon({ tab }: { tab: Tab }) {
-  const p = { width: 20, height: 20, viewBox: '0 0 24 24' as const, fill: 'none' as const, stroke: 'currentColor', strokeWidth: 2, 'aria-hidden': true as const };
+  const p = {
+    width: 20,
+    height: 20,
+    viewBox: '0 0 24 24' as const,
+    fill: 'none' as const,
+    stroke: 'currentColor',
+    strokeWidth: 2,
+    'aria-hidden': true as const,
+  };
   switch (tab) {
     case 'visualizer':
       return (
@@ -95,21 +103,24 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
     touchRef.current = { x0: t.clientX, y0: t.clientY, edge: t.clientX < 28 };
   }, []);
 
-  const onTouchEnd = useCallback((e: TouchEvent) => {
-    const start = touchRef.current;
-    if (!start) return;
-    touchRef.current = null;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - start.x0;
-    const dy = Math.abs(t.clientY - start.y0);
-    if (dy > Math.abs(dx) * 0.75) return;
+  const onTouchEnd = useCallback(
+    (e: TouchEvent) => {
+      const start = touchRef.current;
+      if (!start) return;
+      touchRef.current = null;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - start.x0;
+      const dy = Math.abs(t.clientY - start.y0);
+      if (dy > Math.abs(dx) * 0.75) return;
 
-    if (!drawerOpen && start.edge && dx > 60) {
-      setDrawerOpen(true);
-    } else if (drawerOpen && dx < -60) {
-      setDrawerOpen(false);
-    }
-  }, [drawerOpen]);
+      if (!drawerOpen && start.edge && dx > 60) {
+        setDrawerOpen(true);
+      } else if (drawerOpen && dx < -60) {
+        setDrawerOpen(false);
+      }
+    },
+    [drawerOpen],
+  );
 
   useEffect(() => {
     const el = document.documentElement;
@@ -149,14 +160,14 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
             <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
               <defs>
                 <linearGradient id="nav-logo-g" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#6366f1"/>
-                  <stop offset="100%" stopColor="#06b6d4"/>
+                  <stop offset="0%" stopColor="#6366f1" />
+                  <stop offset="100%" stopColor="#06b6d4" />
                 </linearGradient>
               </defs>
-              <rect x="4" y="20" width="5" height="7" rx="1" fill="url(#nav-logo-g)" opacity=".85"/>
-              <rect x="10.5" y="14" width="5" height="13" rx="1" fill="url(#nav-logo-g)" opacity=".9"/>
-              <rect x="17" y="8" width="5" height="19" rx="1" fill="url(#nav-logo-g)" opacity=".95"/>
-              <rect x="23.5" y="5" width="5" height="22" rx="1" fill="url(#nav-logo-g)"/>
+              <rect x="4" y="20" width="5" height="7" rx="1" fill="url(#nav-logo-g)" opacity=".85" />
+              <rect x="10.5" y="14" width="5" height="13" rx="1" fill="url(#nav-logo-g)" opacity=".9" />
+              <rect x="17" y="8" width="5" height="19" rx="1" fill="url(#nav-logo-g)" opacity=".95" />
+              <rect x="23.5" y="5" width="5" height="22" rx="1" fill="url(#nav-logo-g)" />
             </svg>
           </span>
           <span className="nav__title">{t('nav.brand')}</span>
@@ -181,18 +192,31 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
 
         <div className="nav__actions nav__toolbar">
           <div className="nav__lang" role="group" aria-label="Language">
-            <button type="button" className={`nav__lang-btn ${locale === 'en' ? 'nav__lang-btn--on' : ''}`} onClick={() => setLocale('en')}>
+            <button
+              type="button"
+              className={`nav__lang-btn ${locale === 'en' ? 'nav__lang-btn--on' : ''}`}
+              onClick={() => setLocale('en')}
+            >
               {t('nav.langEn')}
             </button>
-            <button type="button" className={`nav__lang-btn ${locale === 'sq' ? 'nav__lang-btn--on' : ''}`} onClick={() => setLocale('sq')}>
+            <button
+              type="button"
+              className={`nav__lang-btn ${locale === 'sq' ? 'nav__lang-btn--on' : ''}`}
+              onClick={() => setLocale('sq')}
+            >
               {t('nav.langSq')}
             </button>
           </div>
           <button type="button" className="nav__theme" onClick={onTheme} aria-label={t('nav.themeToggle')}>
             {dark ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="5" />
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+              </svg>
             ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
             )}
           </button>
         </div>
@@ -220,14 +244,14 @@ export function Layout({ tab, onTab, dark, onTheme, children }: Props) {
                 <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
                   <defs>
                     <linearGradient id="drawer-logo-g" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#6366f1"/>
-                      <stop offset="100%" stopColor="#06b6d4"/>
+                      <stop offset="0%" stopColor="#6366f1" />
+                      <stop offset="100%" stopColor="#06b6d4" />
                     </linearGradient>
                   </defs>
-                  <rect x="4" y="20" width="5" height="7" rx="1" fill="url(#drawer-logo-g)" opacity=".85"/>
-                  <rect x="10.5" y="14" width="5" height="13" rx="1" fill="url(#drawer-logo-g)" opacity=".9"/>
-                  <rect x="17" y="8" width="5" height="19" rx="1" fill="url(#drawer-logo-g)" opacity=".95"/>
-                  <rect x="23.5" y="5" width="5" height="22" rx="1" fill="url(#drawer-logo-g)"/>
+                  <rect x="4" y="20" width="5" height="7" rx="1" fill="url(#drawer-logo-g)" opacity=".85" />
+                  <rect x="10.5" y="14" width="5" height="13" rx="1" fill="url(#drawer-logo-g)" opacity=".9" />
+                  <rect x="17" y="8" width="5" height="19" rx="1" fill="url(#drawer-logo-g)" opacity=".95" />
+                  <rect x="23.5" y="5" width="5" height="22" rx="1" fill="url(#drawer-logo-g)" />
                 </svg>
               </span>
               <span className="nav__drawer-brand">{t('nav.brand')}</span>

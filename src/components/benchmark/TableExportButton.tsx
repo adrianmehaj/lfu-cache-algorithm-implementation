@@ -21,7 +21,14 @@ interface Props {
 
 const btnMotion = { whileHover: { scale: 1.02 }, whileTap: { scale: 0.98 }, transition: { duration: 0.2 } };
 
-export const TableExportButton = memo(function TableExportButton({ results, sectionTitle, label, hint, headers, sheetName }: Props) {
+export const TableExportButton = memo(function TableExportButton({
+  results,
+  sectionTitle,
+  label,
+  hint,
+  headers,
+  sheetName,
+}: Props) {
   const [busy, setBusy] = useState(false);
 
   const onExport = useCallback(async () => {

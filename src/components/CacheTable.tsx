@@ -6,7 +6,8 @@ export const CacheTable = memo(function CacheTable({ snapshot }: { snapshot: Cac
   const { t } = useI18n();
   const [q, setQ] = useState('');
   const rows = useMemo(
-    () => q ? snapshot.entries.filter((e) => String(e.key).includes(q) || String(e.value).includes(q)) : snapshot.entries,
+    () =>
+      q ? snapshot.entries.filter((e) => String(e.key).includes(q) || String(e.value).includes(q)) : snapshot.entries,
     [q, snapshot.entries],
   );
 
@@ -17,20 +18,55 @@ export const CacheTable = memo(function CacheTable({ snapshot }: { snapshot: Cac
         <div className="cache-table__search-block">
           <span className="cache-table__search-lbl">{t('viz.searchLabel')}</span>
           <div className="ctable__search">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input placeholder={t('viz.filter')} value={q} onChange={(e) => setQ(e.target.value)} aria-label={t('viz.filter')} type="search" enterKeyHint="search" autoComplete="off" />
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input
+              placeholder={t('viz.filter')}
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              aria-label={t('viz.filter')}
+              type="search"
+              enterKeyHint="search"
+              autoComplete="off"
+            />
           </div>
         </div>
       </div>
       <div style={{ overflowX: 'auto' }}>
         <table className="ctable">
-          <thead><tr><th>{t('viz.thKey')}</th><th>{t('viz.thValue')}</th><th>{t('viz.thFreq')}</th></tr></thead>
+          <thead>
+            <tr>
+              <th>{t('viz.thKey')}</th>
+              <th>{t('viz.thValue')}</th>
+              <th>{t('viz.thFreq')}</th>
+            </tr>
+          </thead>
           <tbody>
             {rows.length === 0 ? (
-              <tr><td colSpan={3} className="ctable__empty">{snapshot.entries.length === 0 ? t('viz.emptyCache') : t('viz.noMatch')}</td></tr>
-            ) : rows.map((n) => (
-              <tr key={n.key}><td>{n.key}</td><td>{n.value}</td><td>{n.freq}</td></tr>
-            ))}
+              <tr>
+                <td colSpan={3} className="ctable__empty">
+                  {snapshot.entries.length === 0 ? t('viz.emptyCache') : t('viz.noMatch')}
+                </td>
+              </tr>
+            ) : (
+              rows.map((n) => (
+                <tr key={n.key}>
+                  <td>{n.key}</td>
+                  <td>{n.value}</td>
+                  <td>{n.freq}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
