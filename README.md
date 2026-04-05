@@ -39,16 +39,15 @@ Unlike simple implementations, this system introduces:
 | Category | Description |
 |----------|------------|
 | 🚀 Solver | Executes LFU, LRU, FIFO with identical workloads |
-| 📊 Benchmark | Computes hit rate, miss rate, latency, wall time |
-| 🎬 Visualization | Real-time cache structure (frequency buckets, logs) |
-| 🔁 Simulation | Step-by-step execution (LeetCode-style demo) |
-| ⚙️ Configurable | Capacity, operations, read/write ratio, patterns |
-| 📈 Analysis | Compares policies under different data distributions |
-| 📤 Export | Results export as PNG, SVG, Excel |
-| 🌍 i18n | English / Albanian support |
-| 📱 Responsive | Desktop and mobile support |
-
----
+| 📊 Benchmark | Computes hit rate, miss rate, latency, and wall time |
+| 🎬 Visualization | Real-time cache structure (frequency buckets, operation logs) |
+| 🔁 Simulation | Step-by-step execution (LeetCode-style scenarios) |
+| ⚙️ Configurable | Capacity, operations, read/write ratio, and access patterns |
+| 📈 Analysis | Compares policies under different workload distributions |
+| 📤 Export | Results export as PNG, SVG, and Excel |
+| 🌍 i18n | Multilingual support (English / Albanian) |
+| 🎨 UI/UX | Dark & Light mode with modern interface |
+| 📱 Responsive | Optimized for desktop and mobile devices |
 
 ## 📁 Project Structure
 
