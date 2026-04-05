@@ -158,8 +158,6 @@ It demonstrates:
 Bachelor Thesis Project
 
 ---
-
 ## 📄 License
 
-MIT License
-```
+This project is licensed under the MIT License — see the LICENSE file.
