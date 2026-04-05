@@ -8,8 +8,7 @@ The system simulates real-world caching scenarios, compares multiple replacement
 ---
 
 ## 🔗 Live Demo
-
-https://lfu-cache.netlify.app/
+https://lfu-cache.vercel.app/
 
 ---
 
