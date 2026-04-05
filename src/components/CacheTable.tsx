@@ -1,10 +1,16 @@
 import { memo, useState, useMemo } from 'react';
 import type { CacheSnapshot } from '../types';
 import { useI18n } from '../i18n/I18nContext';
+import { NewHereArrow } from './NewHereArrow';
+
+function tableFocusKey(h: CacheSnapshot['highlight']): number | null {
+  return h.insertedKey ?? h.updatedKey ?? h.accessedKey;
+}
 
 export const CacheTable = memo(function CacheTable({ snapshot }: { snapshot: CacheSnapshot }) {
   const { t } = useI18n();
   const [q, setQ] = useState('');
+  const focusKey = useMemo(() => tableFocusKey(snapshot.highlight), [snapshot.highlight]);
   const rows = useMemo(
     () =>
       q ? snapshot.entries.filter((e) => String(e.key).includes(q) || String(e.value).includes(q)) : snapshot.entries,
@@ -59,13 +65,27 @@ export const CacheTable = memo(function CacheTable({ snapshot }: { snapshot: Cac
                 </td>
               </tr>
             ) : (
-              rows.map((n) => (
-                <tr key={n.key}>
-                  <td>{n.key}</td>
-                  <td>{n.value}</td>
-                  <td>{n.freq}</td>
-                </tr>
-              ))
+              rows.map((n) => {
+                const isFocus = focusKey !== null && n.key === focusKey;
+                return (
+                  <tr key={n.key} className={isFocus ? 'ctable__row--focus' : undefined}>
+                    <td>
+                      <span className="ctable__keycell">
+                        {isFocus ? (
+                          <span className="ctable__pointer" title={t('viz.pointerHint')}>
+                            <NewHereArrow />
+                          </span>
+                        ) : (
+                          <span className="ctable__pointer-spacer" aria-hidden />
+                        )}
+                        {n.key}
+                      </span>
+                    </td>
+                    <td>{n.value}</td>
+                    <td>{n.freq}</td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

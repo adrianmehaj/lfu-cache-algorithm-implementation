@@ -2,6 +2,7 @@ import { memo, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { LogEntry } from '../types';
 import { useI18n } from '../i18n/I18nContext';
+import { NewHereArrow } from './NewHereArrow';
 
 const icons: Record<LogEntry['type'], JSX.Element> = {
   put: (
@@ -50,11 +51,12 @@ export const EventLog = memo(function EventLog({ logs }: { logs: LogEntry[] }) {
   const { t } = useI18n();
   const miss = t('sidebar.miss');
   const reversed = useMemo(() => [...logs].reverse(), [logs]);
+  const latestId = logs.length > 0 ? logs[logs.length - 1]!.id : null;
 
   return (
     <div className="elog">
       <h3 className="card__title elog__title">{t('log.title')}</h3>
-      <div className="elog__list">
+      <div className="elog__list" role="list">
         {reversed.length === 0 ? (
           <p className="elog__empty">{t('log.empty')}</p>
         ) : (
@@ -62,11 +64,20 @@ export const EventLog = memo(function EventLog({ logs }: { logs: LogEntry[] }) {
             {reversed.map((e) => (
               <motion.div
                 key={e.id}
-                className={`elog__item elog__item--${e.type}`}
+                role="listitem"
+                aria-current={e.id === latestId ? 'true' : undefined}
+                className={`elog__item elog__item--${e.type}${e.id === latestId ? ' elog__item--latest' : ''}`}
                 initial={{ opacity: 0, x: 24 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               >
+                {e.id === latestId ? (
+                  <span className="elog__pointer" title={t('viz.pointerHint')} aria-hidden>
+                    <NewHereArrow />
+                  </span>
+                ) : (
+                  <span className="elog__pointer-spacer" aria-hidden />
+                )}
                 <span className="elog__icon">{icons[e.type]}</span>
                 <span>{formatLog(e, t, miss)}</span>
               </motion.div>

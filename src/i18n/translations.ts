@@ -58,6 +58,7 @@ const en: MessageDict = {
     evictedTitle: 'Evicted key',
     evictedHint:
       'The cache was full, so one entry had to be removed. The pair (Key: {key}, Value: {value}) was removed. Under LFU, the removed key had the smallest access count. If several keys shared that count, the one touched longest ago was removed (LRU tie-break within the same frequency).',
+    pointerHint: 'Most recent operation — this row or log entry',
   },
   log: {
     title: 'Operation log',
@@ -198,6 +199,7 @@ const sq: MessageDict = {
     evictedTitle: 'Çelësi i dëbuar nga memoria',
     evictedHint:
       'Memoria ishte plot, prandaj duhej hequr një element. U hoq çifti (Çelësi: {key}, Vlera: {value}). Sipas LFU-së, u hoq çelësi me numrin më të vogël të akseseve. Nëse disa çelësa kishin të njëjtën frekuencë, u hoq ai që nuk ishte prekur më gjatë (barazimi LRU brenda së njëjtës frekuencë).',
+    pointerHint: 'Veprimi më i fundit — ky rresht ose hyrja në regjistër',
   },
   log: {
     title: 'Regjistri i veprimeve',
