@@ -172,7 +172,7 @@ const sq: MessageDict = {
     keyPh: 'Shkruaj çelësin',
     valuePh: 'Shkruaj vlerën',
     put: 'VENDOS',
-    get: 'GET',
+    get: 'MERR',
     miss: 'mungesë (nuk u gjet)',
     clearCache: 'Rivendos memorien',
     presets: 'Skenarë të shpejtë',
@@ -207,19 +207,19 @@ const sq: MessageDict = {
     evict: 'DËBIM — çelësi {key} (Vlera: {value})',
     put: 'VENDOS({key}, {value})',
     putUpdate: 'VENDOS({key}, {value}) [vlera e përditësuar]',
-    get: 'GET({key}) → {result}',
+    get: 'MERR({key}) → {result}',
   },
   demo: {
     step: 'Hapi {n}: {msg}',
     put: 'PUT({k}, {v}). Shtohet çelësi {k}. Frekuenca fillestare është 1 sepse sapo u fut.',
     putFull: 'PUT({k}, {v}). Shtohet çelësi {k}. Tani memoria është plot (kapaciteti 2).',
-    getFreq: 'GET({k}). Aksesohet çelësi {k}. Frekuenca e tij rritet nga {f1} në {f2} (shihni lëvizjen te Buckets).',
+    getFreq: 'MERR({k}). Aksesohet çelësi {k}. Frekuenca e tij rritet nga {f1} në {f2} (shihni lëvizjen te Buckets).',
     evict:
       'PUT({k}, {v}). Memoria është plot. Dëbohet çelësi {old} (frekuenca më e ulët = {f}) për të bërë vend për {k}.',
-    miss: 'GET({k}). Kërkohet çelësi {k}, por nuk gjendet (Cache Miss) sepse u dëbua në hapin e kaluar.',
+    miss: 'MERR({k}). Kërkohet çelësi {k}, por nuk gjendet (Cache Miss) sepse u dëbua në hapin e kaluar.',
     missEvict:
-      "GET({k}). Kërkohet çelësi {k}, por nuk gjendet (Cache Miss) sepse u dëbua për t'i lënë vend {new}-shit.",
-    get: 'GET({k}). Aksesohet çelësi {k}. Frekuenca e tij rritet në {f}.',
+      "MERR({k}). Kërkohet çelësi {k}, por nuk gjendet (Cache Miss) sepse u dëbua për t'i lënë vend {new}-shit.",
+    get: 'MERR({k}). Aksesohet çelësi {k}. Frekuenca e tij rritet në {f}.',
     tieBreak:
       'PUT({k}, {v}). Memoria plot. Dëbohet çelësi {old} (frekuenca {f}, por u aksesu më herët se të tjerët — LRU tie-break).',
     done: 'Shembulli përfundoi me sukses! ✅ Tani mund të provoni veprimet tuaja.',
