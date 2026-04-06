@@ -129,7 +129,7 @@ lfu-cache-visual-simulator
 
 ```
 
-git clone [https://github.com/adrianmehaj/lfu-cache-algorithm-implementation.git](https://github.com/adrianmehaj/lfu-cache-algorithm-implementation.git)
+git clone https://github.com/adrianmehaj/lfu-cache-algorithm-implementation.git
 cd lfu-cache-algorithm-implementation
 npm install
 npm run dev
