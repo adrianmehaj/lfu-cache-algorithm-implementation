@@ -8,8 +8,7 @@ The system simulates real-world caching scenarios, compares multiple replacement
 ---
 
 ## 🔗 Live Demo
-
-https://lfu-cache.netlify.app/
+https://lfu-cache.vercel.app/
 
 ---
 
@@ -130,7 +129,7 @@ lfu-cache-visual-simulator
 
 ```
 
-git clone [https://github.com/adrianmehaj/lfu-cache-algorithm-implementation.git](https://github.com/adrianmehaj/lfu-cache-algorithm-implementation.git)
+git clone https://github.com/adrianmehaj/lfu-cache-algorithm-implementation.git
 cd lfu-cache-algorithm-implementation
 npm install
 npm run dev
