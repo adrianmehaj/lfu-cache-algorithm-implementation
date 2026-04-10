@@ -20,7 +20,7 @@ const en: MessageDict = {
     copyright: '© 2026 Adrian Mehaj — Bachelor Thesis Project • LFU Cache Visual Simulator',
   },
   sidebar: {
-    capacity: 'Capacity',
+    capacity: 'Cache capacity',
     set: 'Apply',
     size: 'Occupied',
     cap: 'Capacity',
