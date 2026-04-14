@@ -31,12 +31,18 @@ export function Sidebar({
   const [key, setKey] = useState('');
   const [val, setVal] = useState('');
   const [getRes, setGetRes] = useState<number | null>(null);
+  const [capError, setCapError] = useState<string | null>(null);
 
   useEffect(() => setCap(String(capacity)), [capacity]);
 
   const handleSet = () => {
     const n = parseInt(cap);
-    if (!isNaN(n) && n >= 0) onCapacity(n);
+    if (isNaN(n) || n < 1 || n > 64) {
+      setCapError(t('sidebar.capError'));
+      return;
+    }
+    setCapError(null);
+    onCapacity(n);
   };
   const handlePut = (e: FormEvent) => {
     e.preventDefault();
@@ -68,10 +74,13 @@ export function Sidebar({
             <input
               className="input"
               type="number"
-              min={0}
+              min={1}
               max={64}
               value={cap}
-              onChange={(e) => setCap(e.target.value)}
+              onChange={(e) => {
+                setCap(e.target.value);
+                setCapError(null);
+              }}
             />
             <button className="btn btn--sm btn--primary" type="button" onClick={handleSet}>
               {t('sidebar.set')}
@@ -91,6 +100,26 @@ export function Sidebar({
               <span className="stat__value">{minFreq}</span>
             </div>
           </div>
+          {capError && (
+            <div className="cap-error-modal" role="alert">
+              <div className="cap-error-modal__content">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span>{capError}</span>
+                <button
+                  className="cap-error-modal__close"
+                  type="button"
+                  onClick={() => setCapError(null)}
+                  aria-label="Close"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

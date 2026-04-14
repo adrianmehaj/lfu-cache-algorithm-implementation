@@ -243,6 +243,60 @@
   outline: var(--focus);
   outline-offset: var(--focus-offset);
 }
+.input--invalid {
+  border-color: var(--danger, #ef4444);
+  box-shadow: 0 0 0 1px var(--danger, #ef4444);
+}
+
+/* Capacity validation toast */
+.cap-error-modal {
+  margin-top: 0.75rem;
+  animation: cap-error-in 0.25s ease-out;
+}
+.cap-error-modal__content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--r-sm);
+  color: #fca5a5;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+[data-theme='light'] .cap-error-modal__content {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #b91c1c;
+}
+.cap-error-modal__content svg {
+  flex-shrink: 0;
+  stroke: #f87171;
+}
+[data-theme='light'] .cap-error-modal__content svg {
+  stroke: #dc2626;
+}
+.cap-error-modal__close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.85rem;
+  opacity: 0.6;
+  padding: 0 0.25rem;
+  transition: opacity 0.15s;
+}
+.cap-error-modal__close:hover {
+  opacity: 1;
+}
+@keyframes cap-error-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .input::placeholder {
   color: var(--dim);
 }
